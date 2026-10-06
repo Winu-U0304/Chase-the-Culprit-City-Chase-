@@ -1,7 +1,7 @@
-<!DOCTYPE html>
-<!-- saved from url=(0123)file:///C:/Users/user/OneDrive/%E3%83%89%E3%82%AD%E3%83%A5%E3%83%A1%E3%83%B3%E3%83%88/%E4%BC%8A%E7%B9%94/mudaino3dgame.html -->
-<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>犯人を追え！ 〜シティ・チェイス〜</title>
 <style>
@@ -82,38 +82,23 @@ body.game-active #menu{display:none!important}
 </style>
 </head>
 <body>
-<canvas id="c" width="1536" height="695" style="width: 1536px; height: 695px;"></canvas>
-<div id="scope"></div><div id="flash"></div><div id="cross" class="plus" style="height: 18px; width: 18px; margin: -9px; display: none;"></div><div id="target"></div>
+<canvas id="c"></canvas>
+<div id="scope"></div><div id="flash"></div><div id="cross"></div><div id="target"></div>
 <div id="hud">
   <div id="stat"></div><div id="time"></div><div id="obj"></div>
   <canvas id="radar" width="180" height="180"></canvas><div id="clues"></div>
-  <div id="hp"><div style="font-size:12px;margin-bottom:3px">HP</div><div id="hpbar"><div id="hpfill"></div></div></div>
+  <div id="hp"><div style="font-size:12px;margin-bottom:3px">HP</div><div id="hpbar"><div id="hpfill"></div></div><div id="medkits" style="font-size:12px;margin-top:5px"></div></div>
   <div id="ammo"></div>
 </div>
 <div id="msg"></div><div id="hint"></div>
 <div id="title" class="ov"><div class="panel"><div class="kicker">OPEN CITY ACTION</div><h1>犯人を<span>追え</span></h1><div class="sub">〜シティ・チェイス〜</div><p class="lead">街を走る無数の車のどこかに、逃走中の犯人がいる。<br>無線のヒントを頼りに車を見つけ出し、撃ち抜け。<br>信号、渋滞、そして暴走車。街は、あなたを待ってくれない。</p><button class="btn record-open">プレイ記録</button><div class="tap">TAP TO START</div></div></div>
-<div id="menu" class="ov"><div class="panel"><div class="kicker">MISSION</div><div id="modes"><button class="btn on" data-m="easy">イージー</button><button class="btn" data-m="normal">通常</button><button class="btn" data-m="hard">ハード</button></div><p id="modeDesc" class="lead" style="margin-top:12px">時間は長め、車も少なめ。犯人もゆっくり逃げる。</p><button class="btn record-open">プレイ記録</button><button class="btn" id="go">出動する</button><button class="btn" id="setBtn">設定</button>
-<div class="ctl"><b>WASD</b> 移動　<b>Shift</b> ダッシュ　<b>Space</b> ジャンプ　<b>マウス</b> 視点<br><b>左クリック</b> 射撃　<b>右クリック(長押し)</b> スコープ　<b>R</b> リロード　<b>V</b> 視点切替(一人称/三人称)<br>車に轢かれるとダメージ！　誤射(民間人の車)は3回でアウト。<br>弾薬箱(黄)と救急箱(白)は街のあちこちに落ちている。</div></div></div>
-<div id="records" class="ov" role="dialog" aria-modal="true" aria-labelledby="recordTitle"><div class="records-panel"><h2 id="recordTitle">プレイ記録</h2><div id="recordsSummary" class="records-summary">プレイ回数 14回　クリア 9回
-最高スコア　イージー 14281　通常 12440　ハード 9967</div><div id="recordsToolbar" class="records-toolbar"><button type="button" class="btn">選択</button><button type="button" class="btn">ゴミ箱を見る (0)</button></div><div id="recordList" class="record-list"><div class="record-entry win"><div class="record-entry-head"><div>14回目　2026/10/5 17:54:59
-イージー / クリア / TIME 03:18 / SCORE 11433</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>13回目　2026/10/5 17:51:43
-イージー / クリア / TIME 03:10 / SCORE 13619</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>12回目　2026/10/5 17:48:43
-ハード / クリア / TIME 02:52 / SCORE 9967</div></div></div><div class="record-entry"><div class="record-entry-head"><div>11回目　2026/10/5 17:48:20
-ハード / 未クリア / TIME 00:17</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>10回目　2026/10/5 17:47:40
-通常 / クリア / TIME 00:29 / SCORE 12440</div></div></div><div class="record-entry"><div class="record-entry-head"><div>9回目　2026/10/5 17:47:18
-通常 / 未クリア / TIME 00:17</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>8回目　2026/10/5 17:44:47
-イージー / クリア / TIME 02:17 / SCORE 11436</div></div></div><div class="record-entry"><div class="record-entry-head"><div>7回目　2026/10/5 17:38:33
-ハード / 未クリア / TIME 06:00</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>6回目　2026/10/5 17:33:45
-ハード / クリア / TIME 04:39 / SCORE 8876</div></div></div><div class="record-entry"><div class="record-entry-head"><div>5回目　2026/10/5 17:32:30
-ハード / 未クリア / TIME 01:06</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>4回目　2026/10/5 17:30:28
-イージー / クリア / TIME 01:16 / SCORE 14281</div></div></div><div class="record-entry"><div class="record-entry-head"><div>3回目　2026/10/5 16:40:09
-イージー / 中断 / TIME 01:19</div></div><div class="record-entry-controls"><button type="button" class="btn record-resume" data-record-index="2">続きから</button></div></div><div class="record-entry win"><div class="record-entry-head"><div>2回目　2026/10/5 16:29:44
-イージー / クリア / TIME 09:31 / SCORE 8903</div></div></div><div class="record-entry win"><div class="record-entry-head"><div>1回目　2026/10/5 16:23:50
-イージー / クリア / TIME 05:34 / SCORE 10064</div></div></div></div><div class="record-actions"><button class="btn record-delete" id="deleteRecords">記録を削除</button><button class="btn" id="closeRecords">閉じる</button></div></div></div>
+<div id="menu" class="ov"><div class="panel"><div class="kicker">MISSION</div><div id="modes"></div><p id="modeDesc" class="lead" style="margin-top:12px"></p><button class="btn record-open">プレイ記録</button><button class="btn" id="go">出動する</button><button class="btn" id="setBtn">設定</button>
+<div class="ctl"><b>WASD</b> 移動　<b>Shift</b> ダッシュ　<b>Space</b> ジャンプ　<b>マウス</b> 視点<br><b>左クリック</b> 射撃　<b>右クリック(長押し)</b> スコープ　<b>R</b> リロード　<b>V</b> 視点切替(一人称/三人称)<br><b>Q</b> 救急箱を使用　<b>E</b> パトカーに乗る／降りる　<b>B</b> 通行止めを設置・移設<br>車に轢かれるとダメージ！　誤射(民間人の車)は3回でアウト。<br>弾薬箱(黄)と救急箱(白)は街のあちこちに落ちている。</div></div></div>
+<div id="records" class="ov" role="dialog" aria-modal="true" aria-labelledby="recordTitle"><div class="records-panel"><h2 id="recordTitle">プレイ記録</h2><div id="recordsSummary" class="records-summary"></div><div id="recordsToolbar" class="records-toolbar"></div><div id="recordList" class="record-list"></div><div class="record-actions"><button class="btn record-delete" id="deleteRecords">記録を削除</button><button class="btn" id="closeRecords">閉じる</button></div></div></div>
 <div id="pause" class="ov"></div>
 <div id="end" class="ov"><h2 id="endT"></h2><p id="endP"></p><p id="endS" style="color:#8fb0d0"></p><button class="btn" id="again">もう一度</button></div>
 <div id="fade"></div>
-<script src="./犯人を追え！ 〜シティ・チェイス〜ver.1_files/three.min.js.ダウンロード"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 (()=>{
 const $=id=>document.getElementById(id),PI=Math.PI,rnd=Math.random,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
@@ -175,22 +160,25 @@ let lastSigT=-9;function updSignals(t){const q=Math.floor(t*2);if(q===lastSigT)r
 const glass=new THREE.MeshLambertMaterial({color:0x1a2530}),tire=lm(0x111111),headM=new THREE.MeshBasicMaterial({color:0xfff2c0}),tailM=new THREE.MeshBasicMaterial({color:0xb01818}),cylG=new THREE.CylinderGeometry(.36,.36,.25,10);
 const CCOL=[[0xd22a2a,'赤'],[0x2a5ad2,'青'],[0xf0f0f0,'白'],[0x1c1c1e,'黒'],[0xe8c92a,'黄'],[0x2fa04a,'緑'],[0xa8adb2,'銀'],[0xe8782a,'オレンジ']];
 const CTYPE={sedan:'セダン',hatch:'ハッチバック',suv:'SUV',van:'バン',truck:'トラック',taxi:'タクシー'};
-function mkCarModel(type,col){const g=new THREE.Group(),add=(geo,m,x,y,z)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);g.add(o);return o};let L=4.4,top=1.5;
+function mkCarModel(type,col,police){const g=new THREE.Group(),add=(geo,m,x,y,z)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);g.add(o);return o};let L=4.4,top=1.5;
 if(type==='truck'){add(bxg(2,1.3,1.8),lm(col),0,1,1.5);add(bxg(1.8,.6,.1),glass,0,1.5,2.42);add(bxg(2.3,2.2,3.6),lm(0xdddddd),0,1.6,-.8);L=6;top=2.7}
 else if(type==='van'){add(bxg(2,1.7,4.6),lm(col),0,1.15,0);add(bxg(1.8,.7,.1),glass,0,1.6,2.31);add(bxg(2.02,.5,2.8),glass,0,1.6,-.4);L=4.6;top=2}
 else{const bh=type==='suv'?.9:.65,ch=type==='suv'?.8:.55,cl=type==='hatch'?2:type==='suv'?2.6:2.2;add(bxg(1.9,bh,4.4),lm(type==='taxi'?0xe8c92a:col),0,.35+bh/2,0);add(bxg(1.7,ch,cl),glass,0,.35+bh+ch/2,-.2);add(bxg(1.74,.08,cl+.05),lm(type==='taxi'?0xe8c92a:col),0,.35+bh+ch+.04,-.2);if(type==='taxi')add(bxg(.7,.22,.3),new THREE.MeshBasicMaterial({color:0xffee88}),0,.35+bh+ch+.2,-.2);top=.35+bh+ch+.1}
 [[-.95,1.4],[.95,1.4],[-.95,-1.4],[.95,-1.4]].forEach(([x,z])=>{add(cylG,tire,x,.36,type==='truck'?z*1.1:z).rotation.z=PI/2});
 [-.7,.7].forEach(x=>{add(bxg(.4,.18,.08),headM,x,.7,L/2);add(bxg(.4,.16,.08),tailM,x,.78,-L/2)});
+if(police){add(bxg(1.05,.13,.25),lm(0x222222),0,top+.08,-.2);add(bxg(.42,.2,.28),lm(0x246bff),-.3,top+.22,-.2);add(bxg(.42,.2,.28),lm(0xff3030),.3,top+.22,-.2)}
 const sh=new THREE.Mesh(new THREE.PlaneGeometry(2.4,L+.6),new THREE.MeshBasicMaterial({color:0,transparent:true,opacity:.28}));sh.rotation.x=-PI/2;sh.position.y=.06;g.add(sh);return{g,L,top}}
-const DIRPSI=[PI/2,-PI/2,0,PI],cars=[];
+const DIRPSI=[PI/2,-PI/2,0,PI],cars=[];let policeCar=null,inPoliceCar=false,roadblock=null,medkits=0;
 function laneT(c){return c.dir===0?ZS(c.road)-3.2:c.dir===1?ZS(c.road)+3.2:c.dir===2?XS(c.road)+3.2:XS(c.road)-3.2}
-function mkCar(opts){const type=opts.type,cc=opts.col,m=mkCarModel(type,cc[0]),c={g:m.g,L:m.L,top:m.top,type,col:cc[0],colName:type==='taxi'?'黄':cc[1],plate:String(1000+((rnd()*9000)|0)),x:0,z:0,psi:0,v:0,dir:0,road:3,cruise:(type==='truck'?9:10+rnd()*4)*DF.spd*(opts.culprit?1.6:1),reckless:opts.culprit||rnd()<.15,culprit:!!opts.culprit,hp:opts.culprit?7:3,dead:false,decided:'',panic:0,tilt:0};S.add(c.g);return c}
+function mkCar(opts){const type=opts.type,cc=opts.col,m=mkCarModel(type,cc[0],opts.police),c={g:m.g,L:m.L,top:m.top,type,col:cc[0],colName:type==='taxi'?'黄':cc[1],plate:String(1000+((rnd()*9000)|0)),x:0,z:0,psi:0,v:0,dir:0,road:3,cruise:(type==='truck'?9:10+rnd()*4)*DF.spd*(opts.culprit?1.6:1),reckless:opts.culprit||rnd()<.15,culprit:!!opts.culprit,isPolice:!!opts.police,hp:opts.culprit?7:3,dead:false,decided:'',panic:0,tilt:0};S.add(c.g);return c}
 function placeCar(c){for(let k=0;k<60;k++){c.dir=(rnd()*4)|0;c.road=(rnd()*7)|0;const s=-300+rnd()*600;if(c.dir<2){c.x=s;c.z=laneT(c)}else{c.z=s;c.x=laneT(c)}c.psi=DIRPSI[c.dir];if(!cars.some(o=>o!==c&&o.placed&&Math.hypot(o.x-c.x,o.z-c.z)<9)){if(Math.hypot(c.x-P.x,c.z-P.z)>25)break}}c.placed=true;c.v=c.cruise*.6}
 let culprit=null;
+function addPoliceCar(){policeCar=mkCar({type:'sedan',col:[0xe8e8e8,'白'],police:true});policeCar.x=0;policeCar.z=-6;policeCar.psi=PI/2;policeCar.v=0;policeCar.cruise=0;policeCar.placed=true;policeCar.g.position.set(policeCar.x,0,policeCar.z);policeCar.g.rotation.y=policeCar.psi;cars.push(policeCar)}
 function spawnTraffic(){cars.forEach(c=>S.remove(c.g));cars.length=0;const types=['sedan','sedan','hatch','suv','van','truck','taxi'];
 const ct=['sedan','hatch','suv','van'][(rnd()*4)|0],cc=CCOL[(rnd()*8)|0];culprit=mkCar({type:ct,col:cc,culprit:true});cars.push(culprit);
 for(let i=1;i<DF.cars;i++){let t,col;do{t=types[(rnd()*types.length)|0];col=CCOL[(rnd()*8)|0]}while(t===ct&&col===cc);cars.push(mkCar({type:t,col}))}
-cars.forEach(placeCar);if(Math.hypot(culprit.x-P.x,culprit.z-P.z)<120){culprit.x+=culprit.dir<2?150:0;culprit.z+=culprit.dir>=2?150:0}}
+cars.forEach(placeCar);if(Math.hypot(culprit.x-P.x,culprit.z-P.z)<120){culprit.x+=culprit.dir<2?150:0;culprit.z+=culprit.dir>=2?150:0}
+addPoliceCar();cars.slice(0,-1).forEach(c=>{if(Math.hypot(c.x-policeCar.x,c.z-policeCar.z)<9){placeCar(c);c.g.position.set(c.x,0,c.z);c.g.rotation.y=c.psi}});inPoliceCar=false}
 // ---------- player ----------
 const P={x:-20,y:0,z:-20,vy:0,yaw:0,pitch:0,vx:0,vz:0,hp:100,inv:0,rag:0,ground:true,walk:0};
 const body=new THREE.Group();{const jm=lm(0x2a4a8a),sm=lm(0xd8b090),pm=lm(0x2a2a30),ad=(g,m,x,y,z)=>{const o=new THREE.Mesh(g,m);o.position.set(x,y,z);body.add(o);return o};ad(bxg(.5,.65,.28),jm,0,1.15,0);ad(new THREE.SphereGeometry(.14,10,8),sm,0,1.62,0);ad(bxg(.3,.08,.3),lm(0x1a1a1a),0,1.74,0);
@@ -201,6 +189,15 @@ const gunV=new THREE.Group();{const dk=lm(0x23252a);[[.06,.08,.3,0,0,0],[.05,.14
 const pick=[];const ammoM=lm(0xe8c030),medM=lm(0xf4f4f4),crossM=lm(0xd02828);
 function mkPickups(saved){pick.forEach(p=>S.remove(p.m));pick.length=0;const items=saved||Array.from({length:16},(_,k)=>{const bi=(rnd()*6)|0,bj=(rnd()*6)|0;return{med:k%2===1,x:(bi-2.5)*PITCH+(rnd()<.5?-31:31)+(rnd()-.5)*4,z:(bj-2.5)*PITCH+(rnd()-.5)*50}});
 items.forEach(({med,x,z})=>{const g=new THREE.Group();g.add(new THREE.Mesh(bxg(.7,.5,.5),med?medM:ammoM));if(med){const c=new THREE.Mesh(bxg(.5,.12,.52),crossM);c.position.y=.02;g.add(c)}g.position.set(x,.6,z);S.add(g);pick.push({m:g,med,x,z})})}
+function buildRoadblock(){const g=new THREE.Group(),red=lm(0xd63b32),white=lm(0xf2eee2),dark=lm(0x33383d);
+g.add(new THREE.Mesh(bxg(9,.38,.35),red)).position.y=.8;
+for(let i=0;i<5;i++){const stripe=new THREE.Mesh(bxg(.45,.4,.37),white);stripe.position.set(-3.6+i*1.8,.8,0);g.add(stripe)}
+[-4,4].forEach(x=>{const leg=new THREE.Mesh(bxg(.2,.8,.2),dark);leg.position.set(x,.4,0);g.add(leg);const foot=new THREE.Mesh(bxg(.8,.12,.65),dark);foot.position.set(x,.06,0);g.add(foot)});
+return g}
+function placeRoadblock(x,z,yaw){if(roadblock)S.remove(roadblock.mesh);const mesh=buildRoadblock();mesh.position.set(x,0,z);mesh.rotation.y=yaw;S.add(mesh);roadblock={x,z,yaw,mesh};say('通行止めを設置しました。Bキーでもう一度移設できます。',2500)}
+function toggleRoadblock(){const distance=5,x=P.x-Math.sin(P.yaw)*distance,z=P.z-Math.cos(P.yaw)*distance;placeRoadblock(x,z,P.yaw)}
+function clearRoadblock(){if(roadblock)S.remove(roadblock.mesh);roadblock=null}
+function useMedkit(){if(!medkits){say('救急箱を持っていません。',1400);return}if(P.hp>=100&&!P.rag){say('HPが満タンです。',1400);return}medkits=0;P.hp=Math.min(100,P.hp+40);P.rag=0;P.vx=0;P.vz=0;P.vy=0;P.y=0;P.ground=true;P.inv=Math.max(P.inv,1);say('救急箱を使用しました。動けるようになりました。HP '+Math.round(P.hp)+'%',2200);saveRunSnapshot()}
 // ---------- audio ----------
 let A=null,mg,nbuf;const eng=[];
 function ainit(){if(A)return;try{A=new(window.AudioContext||window.webkitAudioContext)();mg=A.createGain();mg.gain.value=CFG.vol;mg.connect(A.destination);nbuf=A.createBuffer(1,A.sampleRate,A.sampleRate);const d=nbuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
@@ -263,13 +260,14 @@ try{localStorage.removeItem('cc_record');Object.keys(DFS).forEach(mode=>localSto
 catch(e){alert('記録を削除できませんでした。ブラウザーの保存領域を確認してください。');return}
 playRecord={plays:0,wins:0,last:null,history:[],trash:[]};activeRecord=null;recordView='active';selectingRecords=false;renderPlayRecord()}
 $('deleteRecords').onclick=deletePlayRecords;
-function saveRunSnapshot(){if(!activeRecord)return;activeRecord.time=Math.round(gt);activeRecord.snapshot={mode:MODE,gt,player:{...P},ammo,reserve,reloadT,shotCd,mist,shots,hitsN,clueIdx,view,tscale,killed,endT,cars:cars.map(({g,...c})=>({...c})),pickups:pick.map(({m,...p})=>({...p})),clues:[...$('clues').children].map(d=>d.textContent)};savePlayRecord()}
+function saveRunSnapshot(){if(!activeRecord)return;activeRecord.time=Math.round(gt);activeRecord.snapshot={mode:MODE,gt,player:{...P},ammo,reserve,reloadT,shotCd,mist,shots,hitsN,clueIdx,view,medkits,inPoliceCar,tscale,killed,endT,roadblock:roadblock?{x:roadblock.x,z:roadblock.z,yaw:roadblock.yaw}:null,cars:cars.map(({g,...c})=>({...c})),pickups:pick.map(({m,...p})=>({...p})),clues:[...$('clues').children].map(d=>d.textContent)};savePlayRecord()}
 function activateRun(record){activeRecord=record;record.status='playing';setMode(record.mode);document.body.classList.add('game-active');$('menu').style.display='none';$('title').style.display='none';$('records').style.display='none';$('pause').style.display='none';$('end').style.display='none';const snap=record.snapshot;
-gt=snap.gt;Object.assign(P,snap.player);ammo=snap.ammo;reserve=snap.reserve;reloadT=snap.reloadT;shotCd=snap.shotCd;mist=snap.mist;shots=snap.shots;hitsN=snap.hitsN;clueIdx=snap.clueIdx;view=snap.view;zoom=0;tscale=snap.tscale||1;killed=!!snap.killed;endT=snap.endT||0;cars.forEach(c=>S.remove(c.g));cars.length=0;culprit=null;
-snap.cars.forEach(saved=>{const c=mkCar({type:saved.type,col:[saved.col,saved.colName],culprit:saved.culprit});Object.assign(c,saved,{g:c.g});cars.push(c);if(c.culprit)culprit=c});
-mkPickups(snap.pickups||[]);$('clues').replaceChildren(...(snap.clues||[]).map(text=>{const clue=document.createElement('div');clue.textContent=text;return clue}));recordSaveT=gt;state='play';$('hud').style.display='block';$('hint').textContent='';crossShow();applyCfg();saveRunSnapshot();requestViewControl()}
+gt=snap.gt;Object.assign(P,snap.player);ammo=snap.ammo;reserve=snap.reserve;reloadT=snap.reloadT;shotCd=snap.shotCd;mist=snap.mist;shots=snap.shots;hitsN=snap.hitsN;clueIdx=snap.clueIdx;view=snap.view;medkits=snap.medkits||0;inPoliceCar=!!snap.inPoliceCar;zoom=0;tscale=snap.tscale||1;killed=!!snap.killed;endT=snap.endT||0;cars.forEach(c=>S.remove(c.g));cars.length=0;culprit=null;policeCar=null;clearRoadblock();
+snap.cars.forEach(saved=>{const c=mkCar({type:saved.type,col:[saved.col,saved.colName],culprit:saved.culprit,police:saved.isPolice});Object.assign(c,saved,{g:c.g});c.g.position.set(c.x,0,c.z);c.g.rotation.y=c.psi;c.g.rotation.z=c.tilt||0;cars.push(c);if(c.culprit)culprit=c;if(c.isPolice)policeCar=c});
+if(!policeCar)addPoliceCar();policeCar.g.visible=!inPoliceCar;
+mkPickups(snap.pickups||[]);if(snap.roadblock)placeRoadblock(snap.roadblock.x,snap.roadblock.z,snap.roadblock.yaw);$('clues').replaceChildren(...(snap.clues||[]).map(text=>{const clue=document.createElement('div');clue.textContent=text;return clue}));recordSaveT=gt;state='play';$('hud').style.display='block';$('hint').textContent='';crossShow();applyCfg();saveRunSnapshot();requestViewControl()}
 function continueRun(index){const record=playRecord.history[index];if(record&&record.snapshot)activateRun(record)}
-function startGame(){ainit();document.body.classList.add('game-active');P.x=-20;P.z=-20;P.y=0;P.vy=0;P.yaw=0;P.pitch=-.1;P.hp=100;P.inv=0;P.rag=0;P.ground=true;P.walk=0;gt=0;ammo=12;reserve=48;reloadT=0;shotCd=0;mist=0;shots=0;hitsN=0;tscale=1;killed=false;clueIdx=0;playRecord.plays++;activeRecord={number:playRecord.plays,mode:MODE,status:'playing',time:0,score:0,date:Date.now(),snapshot:null};playRecord.history.push(activeRecord);playRecord.last={mode:MODE,win:false,score:0,time:0};$('clues').innerHTML='';spawnTraffic();mkPickups();cars.forEach(c=>{c.v=c.cruise*.6});recordSaveT=0;saveRunSnapshot();renderPlayRecord();state='play';$('hud').style.display='block';crossShow();applyCfg();requestViewControl();say('犯人を探し出せ！ 無線に耳を傾けろ。',3200)}
+function startGame(){ainit();document.body.classList.add('game-active');P.x=-20;P.z=-20;P.y=0;P.vy=0;P.yaw=0;P.pitch=-.1;P.hp=100;P.inv=0;P.rag=0;P.ground=true;P.walk=0;gt=0;ammo=12;reserve=48;reloadT=0;shotCd=0;mist=0;shots=0;hitsN=0;medkits=0;inPoliceCar=false;clearRoadblock();tscale=1;killed=false;clueIdx=0;playRecord.plays++;activeRecord={number:playRecord.plays,mode:MODE,status:'playing',time:0,score:0,date:Date.now(),snapshot:null};playRecord.history.push(activeRecord);playRecord.last={mode:MODE,win:false,score:0,time:0};$('clues').innerHTML='';spawnTraffic();mkPickups();cars.forEach(c=>{if(!c.isPolice)c.v=c.cruise*.6});recordSaveT=0;saveRunSnapshot();renderPlayRecord();state='play';$('hud').style.display='block';crossShow();applyCfg();requestViewControl();say('犯人を探し出せ！ 無線に耳を傾けろ。',3200)}
 $('go').onclick=startGame;
 function end(win,title,txt){if(state==='end')return;state='end';document.body.classList.remove('game-active');document.exitPointerLock&&document.exitPointerLock();$('hud').style.display='none';$('cross').style.display='none';$('scope').style.opacity=0;$('target').textContent='';let best='',sc=0;const acc=shots?Math.round(hitsN/shots*100):0;
 if(win){sc=Math.round(5000+(DF.time-gt)*8+P.hp*20+(DF.mist-mist)*300+acc*10);try{const k='cc_best_'+MODE,b=+localStorage.getItem(k)||0;if(sc>b){localStorage.setItem(k,sc);best='　ハイスコア更新！'}else best='　ハイスコア '+b}catch(e){}$('endS').textContent='SCORE '+sc+'　TIME '+fmtT(gt)+'　命中率 '+acc+'%　誤射 '+mist+best}else $('endS').textContent='TIME '+fmtT(gt)+'　命中率 '+acc+'%　誤射 '+mist;
@@ -292,7 +290,7 @@ addEventListener('pagehide',()=>{if(state==='play'||state==='paused'){saveRunSna
 $('setBtn').onclick=()=>{ainit();buildPause();$('pause').style.display='flex'};
 document.addEventListener('pointerlockchange',()=>{if(state==='play'&&!document.pointerLockElement)pause()});
 // ---------- input ----------
-addEventListener('keydown',e=>{if(e.repeat)return;K[e.code]=1;if(e.code==='Escape'&&state==='play'){e.preventDefault();pause();return}if(state!=='play')return;if(e.code==='KeyR')reload();if(e.code==='KeyV'){view=view?0:1;CFG.view=view;applyCfg()}});
+addEventListener('keydown',e=>{if(e.repeat)return;K[e.code]=1;if(e.code==='Escape'&&state==='play'){e.preventDefault();pause();return}if(state!=='play')return;if(e.code==='KeyR')reload();if(e.code==='KeyQ')useMedkit();if(e.code==='KeyE')togglePoliceCar();if(e.code==='KeyB')toggleRoadblock();if(e.code==='KeyV'){view=view?0:1;CFG.view=view;applyCfg()}});
 addEventListener('keyup',e=>K[e.code]=0);
 addEventListener('mousemove',e=>{if(state!=='play'||!document.pointerLockElement)return;const s=.0023*CFG.sens*(zoom>.5?.4:1);P.yaw-=e.movementX*s;P.pitch=clamp(P.pitch-e.movementY*s*(CFG.inv?-1:1),-1.4,1.2)});
  cvs.addEventListener('click',()=>{if(state==='play'&&!document.pointerLockElement)requestViewControl()});
@@ -305,9 +303,9 @@ function rayBox(o,d,x0,x1,y0,y1,z0,z1){let t0=0,t1=1e9;const lo=[x0,y0,z0],hi=[x
 function rayCar(c,r){const s=Math.sin(c.psi),co=Math.cos(c.psi),dx=r.o[0]-c.x,dz=r.o[2]-c.z,lo=[dx*co-dz*s,r.o[1],dx*s+dz*co],ld=[r.d[0]*co-r.d[2]*s,r.d[1],r.d[0]*s+r.d[2]*co];const t=rayBox(lo,ld,-1,1,.3,c.top,-c.L/2,c.L/2);if(t<0)return null;const hy=lo[1]+ld[1]*t,hz=lo[2]+ld[2]*t;return{t,crit:hy>c.top-.55}}
 const FX=[];function fx(x,y,z,col,n,sp,life,sz){for(let i=0;i<n;i++){const m=new THREE.Mesh(new THREE.SphereGeometry(sz||.12,5,4),new THREE.MeshBasicMaterial({color:col,transparent:true}));m.position.set(x,y,z);S.add(m);FX.push({m,vx:(rnd()-.5)*sp,vy:rnd()*sp*.9,vz:(rnd()-.5)*sp,life,max:life})}}
 function updFX(dt){for(let i=FX.length-1;i>=0;i--){const f=FX[i];f.life-=dt;f.vy-=9*dt;f.m.position.x+=f.vx*dt;f.m.position.y=Math.max(.05,f.m.position.y+f.vy*dt);f.m.position.z+=f.vz*dt;f.m.material.opacity=Math.max(0,f.life/f.max);if(f.life<=0){S.remove(f.m);FX.splice(i,1)}}}
-function fire(){if(reloadT>0||shotCd>0)return;if(ammo<=0){nz(.04,900,'square',.2);shotCd=.3;if(reserve>0)reload();return}
+function fire(){if(inPoliceCar||reloadT>0||shotCd>0)return;if(ammo<=0){nz(.04,900,'square',.2);shotCd=.3;if(reserve>0)reload();return}
 ammo--;shots++;shotCd=.22;muzzle.intensity=3;setTimeout(()=>muzzle.intensity=0,60);nz(.25,900,'lowpass',.8);nz(.07,3000,'highpass',.4);tn(140,.2,'square',.25,50);P.pitch=Math.min(1.2,P.pitch+.012);
-const r=camRay();let bt=1e9,bc=null,crit=false;cars.forEach(c=>{if(c.dead)return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c;crit=h.crit}});
+const r=camRay();let bt=1e9,bc=null,crit=false;cars.forEach(c=>{if(c.dead||c.isPolice)return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c;crit=h.crit}});
 let wt=250;BL.forEach(b=>{const t=rayBox(r.o,r.d,b[0],b[1],0,b[4],b[2],b[3]);if(t>0&&t<wt)wt=t});
 if(bc&&bt<wt&&bt<220){const hx=r.o[0]+r.d[0]*bt,hy=r.o[1]+r.d[1]*bt,hz=r.o[2]+r.d[2]*bt;fx(hx,hy,hz,0xffe080,6,5,.4);hitsN++;hitFlash=.15;hitCar(bc,crit?2:1)}
 else if(wt<250){fx(r.o[0]+r.d[0]*wt,r.o[1]+r.d[1]*wt,r.o[2]+r.d[2]*wt,0xcccccc,4,3,.35,.08)}}
@@ -318,9 +316,10 @@ function boom(c){c.dead=true;c.v=0;killed=true;endT=2.4;tscale=.3;nz(1.4,300,'lo
 function nextStop(c){let i,j,dist;if(c.dir===0){i=Math.ceil((c.x+2.2+8.5-.2)/PITCH)+3;j=c.road;dist=XS(i)-8.5-(c.x+2.2)}else if(c.dir===1){i=Math.floor((c.x-2.2-8.5+.2)/PITCH)+3;j=c.road;dist=(c.x-2.2)-(XS(i)+8.5)}else if(c.dir===2){j=Math.ceil((c.z+2.2+8.5-.2)/PITCH)+3;i=c.road;dist=ZS(j)-8.5-(c.z+2.2)}else{j=Math.floor((c.z-2.2-8.5+.2)/PITCH)+3;i=c.road;dist=(c.z-2.2)-(ZS(j)+8.5)}
 if(i<0||i>6||j<0||j>6)return null;return{i,j,dist,axis:c.dir<2?1:0}}
 const SGN=[1,-1,-1,1];
-function updCars(dt,tg){cars.forEach(c=>{if(c.dead)return;c.panic=Math.max(0,c.panic-dt);const s=Math.sin(c.psi),co=Math.cos(c.psi);let vt=c.cruise*(c.panic>0?1.35:1);
+function updCars(dt,tg){cars.forEach(c=>{if(c.dead||c.isPolice)return;c.panic=Math.max(0,c.panic-dt);const s=Math.sin(c.psi),co=Math.cos(c.psi);let vt=c.cruise*(c.panic>0?1.35:1);
 // obstacle ahead
 let gap=99;cars.forEach(o=>{if(o===c||o.dead)return;const dx=o.x-c.x,dz=o.z-c.z,f=dx*s+dz*co,l=Math.abs(dx*co-dz*s);if(f>0&&f<22&&l<2.3){const g=f-(c.L+o.L)/2;if(g<gap)gap=g}});
+if(roadblock){const dx=roadblock.x-c.x,dz=roadblock.z-c.z,f=dx*s+dz*co,l=Math.abs(dx*co-dz*s);if(f>0&&f<30&&l<5.2&&Math.abs(Math.sin(c.psi-roadblock.yaw))<.5)gap=Math.min(gap,f-c.L/2-.5)}
 if(!c.reckless||c.panic<=0){if(!c.culprit&&!c.panic){const dx=P.x-c.x,dz=P.z-c.z,f=dx*s+dz*co,l=Math.abs(dx*co-dz*s);if(!c.reckless&&P.y<1.5&&f>0&&f<18&&l<2.6){const g=f-2.6;if(g<gap)gap=g}}}
 else if(c.culprit){}
 if(gap<99){vt=Math.min(vt,Math.sqrt(2*7*Math.max(0,gap-2)));if(gap<2)vt=0}
@@ -336,25 +335,32 @@ c.x+=Math.sin(c.psi)*c.v*dt;c.z+=Math.cos(c.psi)*c.v*dt;
 if(c.x>WRAP)c.x=-WRAP;if(c.x<-WRAP)c.x=WRAP;if(c.z>WRAP)c.z=-WRAP;if(c.z<-WRAP)c.z=WRAP;
 c.g.position.set(c.x,0,c.z);c.g.rotation.y=c.psi;c.g.rotation.z=c.dead?c.g.rotation.z:-clamp(da,-.5,.5)*c.v*.01;
 // hits the player
-if(!P.rag&&P.inv<=0&&P.y<1.3&&c.v>1.5){const dx=P.x-c.x,dz=P.z-c.z,f=dx*s+dz*co,l=dx*co-dz*s;if(Math.abs(f)<c.L/2+.4&&Math.abs(l)<1.3){const dmg=Math.min(70,(8+c.v*3.2)*DF.hp);P.hp-=dmg;P.inv=1.8;P.rag=.9;P.vy=6;P.vx=Math.sin(c.psi)*c.v*.9;P.vz=Math.cos(c.psi)*c.v*.9;P.ground=false;nz(.3,200,'lowpass',.9);tn(90,.3,'sawtooth',.3,40);horn(1);$('flash').style.opacity=.55;setTimeout(()=>$('flash').style.opacity=0,300);say('轢かれた！',1500);fx(P.x,1,P.z,0xffffff,10,6,.5,.1)}}
-else if(c.v<=1.5&&Math.abs((P.x-c.x)*co-(P.z-c.z)*s)<1.3&&Math.abs((P.x-c.x)*s+(P.z-c.z)*co)<c.L/2+.4&&P.y<1.3){const dx=P.x-c.x,dz=P.z-c.z,l=dx*co-dz*s,sg=l>=0?1:-1;P.x+=co*sg*.12;P.z-=s*sg*.12}})}
+if(!inPoliceCar&&!P.rag&&P.inv<=0&&P.y<1.3&&c.v>1.5){const dx=P.x-c.x,dz=P.z-c.z,f=dx*s+dz*co,l=dx*co-dz*s;if(Math.abs(f)<c.L/2+.4&&Math.abs(l)<1.3){const dmg=Math.min(70,(8+c.v*3.2)*DF.hp);P.hp-=dmg;P.inv=1.8;P.rag=.9;P.vy=6;P.vx=Math.sin(c.psi)*c.v*.9;P.vz=Math.cos(c.psi)*c.v*.9;P.ground=false;nz(.3,200,'lowpass',.9);tn(90,.3,'sawtooth',.3,40);horn(1);$('flash').style.opacity=.55;setTimeout(()=>$('flash').style.opacity=0,300);say('轢かれた！',1500);fx(P.x,1,P.z,0xffffff,10,6,.5,.1)}}
+else if(!inPoliceCar&&c.v<=1.5&&Math.abs((P.x-c.x)*co-(P.z-c.z)*s)<1.3&&Math.abs((P.x-c.x)*s+(P.z-c.z)*co)<c.L/2+.4&&P.y<1.3){const dx=P.x-c.x,dz=P.z-c.z,l=dx*co-dz*s,sg=l>=0?1:-1;P.x+=co*sg*.12;P.z-=s*sg*.12}})}
 // ---------- player update ----------
 const bAt=(x,z,r)=>{const b0=Math.floor((x-r+240)/PITCH),b1=Math.floor((x+r+240)/PITCH),c0=Math.floor((z-r+240)/PITCH),c1=Math.floor((z+r+240)/PITCH);for(let a=b0;a<=b1;a++)for(let c=c0;c<=c1;c++){if(a<0||a>5||c<0||c>5)continue;for(const b of BG[a][c])if(P.y<b[4]&&x+r>b[0]&&x-r<b[1]&&z+r>b[2]&&z-r<b[3])return true}return false};
-function updPlayer(dt){P.inv=Math.max(0,P.inv-dt);const sin=Math.sin(P.yaw),cos=Math.cos(P.yaw);let mx=0,mz=0;if(!P.rag){if(K.KeyW)mz-=1;if(K.KeyS)mz+=1;if(K.KeyA)mx-=1;if(K.KeyD)mx+=1}
+function updatePoliceDrive(dt){if(!policeCar)return;const throttle=K.KeyW?1:K.KeyS?-1:0;policeCar.v=clamp(policeCar.v+throttle*12*dt,-7,18);if(!throttle)policeCar.v*=Math.pow(.08,dt);if(Math.abs(policeCar.v)>.15)policeCar.psi+=((K.KeyA?1:0)-(K.KeyD?1:0))*1.7*dt*Math.sign(policeCar.v);
+const nx=clamp(policeCar.x+Math.sin(policeCar.psi)*policeCar.v*dt,-LIM,LIM),nz=clamp(policeCar.z+Math.cos(policeCar.psi)*policeCar.v*dt,-LIM,LIM);
+let blocked=false;if(roadblock){const dx=roadblock.x-policeCar.x,dz=roadblock.z-policeCar.z,f=dx*Math.sin(policeCar.psi)+dz*Math.cos(policeCar.psi),l=Math.abs(dx*Math.cos(policeCar.psi)-dz*Math.sin(policeCar.psi));blocked=Math.abs(f)<4&&l<5.2&&Math.abs(Math.sin(policeCar.psi-roadblock.yaw))<.5}
+if(blocked){policeCar.v=0}else{if(!bAt(nx,policeCar.z,1.1))policeCar.x=nx;else policeCar.v=0;if(!bAt(policeCar.x,nz,2.2))policeCar.z=nz;else policeCar.v=0}
+policeCar.g.position.set(policeCar.x,0,policeCar.z);policeCar.g.rotation.y=policeCar.psi;P.x=policeCar.x;P.z=policeCar.z;P.y=0;P.vy=0;P.yaw=policeCar.psi+PI}
+function togglePoliceCar(){if(inPoliceCar){inPoliceCar=false;policeCar.g.visible=true;P.x=clamp(policeCar.x+Math.cos(policeCar.psi)*2.5,-LIM,LIM);P.z=clamp(policeCar.z-Math.sin(policeCar.psi)*2.5,-LIM,LIM);P.yaw=policeCar.psi+PI;P.vx=0;P.vz=0;say('パトカーから降りました。',1400);return}
+if(policeCar&&Math.hypot(P.x-policeCar.x,P.z-policeCar.z)<5){inPoliceCar=true;policeCar.g.visible=false;P.x=policeCar.x;P.z=policeCar.z;P.yaw=policeCar.psi+PI;say('パトカーに乗りました。WASDで運転できます。',1800)}else say('近くに乗れるパトカーがありません。',1500)}
+function updPlayer(dt){P.inv=Math.max(0,P.inv-dt);if(inPoliceCar)updatePoliceDrive(dt);const sin=Math.sin(P.yaw),cos=Math.cos(P.yaw);let mx=0,mz=0;if(!P.rag&&!inPoliceCar){if(K.KeyW)mz-=1;if(K.KeyS)mz+=1;if(K.KeyA)mx-=1;if(K.KeyD)mx+=1}
 const mv=mx||mz,run=(K.ShiftLeft||K.ShiftRight)&&mv,sp=zoom>.5?2.5:run?9.5:5.2;let vx=0,vz=0;if(mv){const l=Math.hypot(mx,mz);mx/=l;mz/=l;vx=(mx*cos+mz*sin)*sp;vz=(-mx*sin+mz*cos)*sp;P.walk+=dt*(run?12:8)}
 if(P.rag>0){P.rag-=dt;vx=P.vx;vz=P.vz;P.vx*=.985;P.vz*=.985}
-if(K.Space&&P.ground&&!P.rag){P.vy=7.5;P.ground=false}P.vy-=20*dt;P.y+=P.vy*dt;if(P.y<=0){P.y=0;P.vy=0;P.ground=true}
-let nx=P.x+vx*dt,nz=P.z+vz*dt;nx=clamp(nx,-LIM,LIM);nz=clamp(nz,-LIM,LIM);if(!bAt(nx,P.z,.4))P.x=nx;if(!bAt(P.x,nz,.4))P.z=nz;
+if(!inPoliceCar){if(K.Space&&P.ground&&!P.rag){P.vy=7.5;P.ground=false}P.vy-=20*dt;P.y+=P.vy*dt;if(P.y<=0){P.y=0;P.vy=0;P.ground=true}
+let nx=P.x+vx*dt,nz=P.z+vz*dt;nx=clamp(nx,-LIM,LIM);nz=clamp(nz,-LIM,LIM);if(!bAt(nx,P.z,.4))P.x=nx;if(!bAt(P.x,nz,.4))P.z=nz}
 // pickups
-for(let i=pick.length-1;i>=0;i--){const p=pick[i];p.m.rotation.y+=dt*2;if(Math.hypot(p.x-P.x,p.z-P.z)<1.8){if(p.med){if(P.hp>=100)continue;P.hp=Math.min(100,P.hp+40);say('救急箱：HP回復',1500)}else{reserve+=18;say('弾薬を拾った（予備 '+reserve+'）',1500)}tn(900,.1,'sine',.1,1400);S.remove(p.m);pick.splice(i,1)}}
+for(let i=pick.length-1;i>=0;i--){const p=pick[i];p.m.rotation.y+=dt*2;if(Math.hypot(p.x-P.x,p.z-P.z)<1.8){if(p.med){if(medkits>=1)continue;medkits=1;say('救急箱を拾いました。Qキーで使用できます。',2000)}else{reserve+=18;say('弾薬を拾った（予備 '+reserve+'）',1500)}tn(900,.1,'sine',.1,1400);S.remove(p.m);pick.splice(i,1)}}
 if(P.hp<=0)end(false,'ゲームオーバー','車に轢かれ続け、街の片隅で意識を失った。……犯人は、まだ走っている。');
-body.position.set(P.x,P.y,P.z);if(view){const sw=Math.sin(P.walk)*.7*(mv?1:0);body.legL.rotation.x=sw;body.legR.rotation.x=-sw;body.armL.rotation.x=-sw}body.visible=!!view&&zoom<.5;if(!zoom&&view&&mv)body.rotation.y=Math.atan2(vx,vz);else body.rotation.y=P.yaw+PI;
+body.position.set(P.x,P.y,P.z);if(view){const sw=Math.sin(P.walk)*.7*(mv?1:0);body.legL.rotation.x=sw;body.legR.rotation.x=-sw;body.armL.rotation.x=-sw}body.visible=!inPoliceCar&&!!view&&zoom<.5;if(!zoom&&view&&mv)body.rotation.y=Math.atan2(vx,vz);else body.rotation.y=P.yaw+PI;
 // camera
 const fov=CFG.fov+(25-CFG.fov)*zoom;if(Math.abs(cam.fov-fov)>.05){cam.fov=fov;cam.updateProjectionMatrix()}
 const cp=Math.cos(P.pitch),fx_=-Math.sin(P.yaw)*cp,fy=Math.sin(P.pitch),fz=-Math.cos(P.yaw)*cp,hx=P.x,hy=P.y+1.6,hz=P.z;
-if(view&&zoom<.5){let d=4.2;while(d>.8&&(bAt(hx-fx_*d,hz-fz*d,.2)||hy-fy*d<.3))d-=.4;cam.position.set(hx-fx_*d+Math.cos(P.yaw)*.5,Math.max(.4,hy-fy*d+.35),hz-fz*d-Math.sin(P.yaw)*.5)}else cam.position.set(hx,hy,hz);
+if(inPoliceCar&&policeCar){cam.position.set(policeCar.x+Math.sin(policeCar.psi)*2.35,2.15,policeCar.z+Math.cos(policeCar.psi)*2.35)}else if(view&&zoom<.5){let d=4.2;while(d>.8&&(bAt(hx-fx_*d,hz-fz*d,.2)||hy-fy*d<.3))d-=.4;cam.position.set(hx-fx_*d+Math.cos(P.yaw)*.5,Math.max(.4,hy-fy*d+.35),hz-fz*d-Math.sin(P.yaw)*.5)}else cam.position.set(hx,hy,hz);
 if(P.rag>0){cam.rotation.set(P.pitch,P.yaw,Math.sin(P.rag*18)*.4)}else cam.rotation.set(P.pitch,P.yaw,0);
-gunV.visible=!view&&zoom<.5}
+gunV.visible=!inPoliceCar&&!view&&zoom<.5}
 // ---------- radar ----------
 const rc=$('radar').getContext('2d');
 function drawRadar(){const w=180,cx=90,k=.72;rc.clearRect(0,0,w,w);rc.save();rc.beginPath();rc.arc(cx,cx,89,0,PI*2);rc.clip();rc.fillStyle='rgba(20,34,50,.7)';rc.fillRect(0,0,w,w);const sy=Math.sin(P.yaw),cy=Math.cos(P.yaw),tr=(x,z)=>{const dx=x-P.x,dz=z-P.z;return[cx+(dx*cy-dz*sy)*k,cx+(dx*sy+dz*cy)*k]};
@@ -384,14 +390,14 @@ if(state==='play'){
 while(clueIdx<CLUES.length&&gt>=CLUES[clueIdx][0]){addClue(CLUES[clueIdx][1]());clueIdx++}
 if(gt>=DF.time)end(false,'時間切れ','犯人は街の外へ消えた。……もう、追う手がかりはない。');
 // engine sounds
-if(A&&eng.length){const near=cars.filter(c=>!c.dead).map(c=>[c,Math.hypot(c.x-P.x,c.z-P.z)]).sort((a,b)=>a[1]-b[1]).slice(0,4);eng.forEach((e,i)=>{const n=near[i];if(n&&n[1]<60){e.o.frequency.value=48+n[0].v*7;e.g.gain.value=.05*(1-n[1]/60)}else e.g.gain.value=0});}
+if(A&&eng.length){const near=cars.filter(c=>!c.dead&&!c.isPolice).map(c=>[c,Math.hypot(c.x-P.x,c.z-P.z)]).sort((a,b)=>a[1]-b[1]).slice(0,4);eng.forEach((e,i)=>{const n=near[i];if(n&&n[1]<60){e.o.frequency.value=48+n[0].v*7;e.g.gain.value=.05*(1-n[1]/60)}else e.g.gain.value=0});}
 // hud
-sigT-=dt;if(sigT<=0){sigT=.1;$('time').textContent=fmtT(DF.time-gt);$('time').style.color=DF.time-gt<60?'#ff6a5a':'#eef3f8';$('hpfill').style.width=Math.max(0,P.hp)+'%';$('ammo').innerHTML=(reloadT>0?'RELOAD':ammo)+' <small>/ '+reserve+'</small>';$('stat').innerHTML=DF.n+'　誤射 '+mist+' / '+DF.mist+'<br>視点 '+(view?'三人称':'一人称')+' (V)';$('obj').textContent='逃走中の犯人の車を見つけて撃て';radarPulse+=.1;drawRadar();
-const r=camRay();let bt=1e9,bc=null;cars.forEach(c=>{if(c.dead)return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c}});$('target').textContent=bc&&bt<(zoom>.5?120:45)?(bc.colName+'の'+CTYPE[bc.type]+'　ナンバー '+bc.plate):'';$('cross').classList.toggle('hit',hitFlash>0);$('scope').style.opacity=zoom>.5?1:0;crossShow()}
-const near2=pick.find(p=>Math.hypot(p.x-P.x,p.z-P.z)<4);$('hint').textContent=''}}
+sigT-=dt;if(sigT<=0){sigT=.1;$('time').textContent=fmtT(DF.time-gt);$('time').style.color=DF.time-gt<60?'#ff6a5a':'#eef3f8';$('hpfill').style.width=Math.max(0,P.hp)+'%';$('medkits').textContent='救急箱 '+medkits+' / 1 (Q)';$('ammo').innerHTML=(reloadT>0?'RELOAD':ammo)+' <small>/ '+reserve+'</small>';$('stat').innerHTML=DF.n+'　誤射 '+mist+' / '+DF.mist+'<br>視点 '+(view?'三人称':'一人称')+' (V)';$('obj').textContent='逃走中の犯人の車を見つけて撃て';radarPulse+=.1;drawRadar();
+const r=camRay();let bt=1e9,bc=null;cars.forEach(c=>{if(c.dead||c.isPolice)return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c}});$('target').textContent=bc&&bt<(zoom>.5?120:45)?(bc.colName+'の'+CTYPE[bc.type]+'　ナンバー '+bc.plate):'';$('cross').classList.toggle('hit',hitFlash>0);$('scope').style.opacity=zoom>.5?1:0;crossShow()}
+const near2=pick.find(p=>Math.hypot(p.x-P.x,p.z-P.z)<4);$('hint').textContent=inPoliceCar?'E：降りる　WASD：運転　B：通行止め':policeCar&&Math.hypot(policeCar.x-P.x,policeCar.z-P.z)<5?'E：パトカーに乗る':near2?(near2.med?(medkits?'救急箱は所持上限です':'救急箱を拾う'):'弾薬を拾う'):''}}
 R.render(S,cam)}
 applyCfg();requestAnimationFrame(loop);
 })();
 </script>
-
-</body></html>
+</body>
+</html>
