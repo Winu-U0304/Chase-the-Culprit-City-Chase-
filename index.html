@@ -48,6 +48,8 @@ html,body{margin:0;height:100%;background:#0b1118;overflow:hidden;font-family:"H
 .btn:hover{background:#1f4a73}.btn.on{background:#2a6aa8;border-color:#9fd0ff}
 #title{display:block;cursor:pointer;background:linear-gradient(90deg,rgba(5,12,20,.88) 0%,rgba(5,12,20,.4) 50%,transparent 75%)}
 #title,#menu{overflow-y:auto}
+#version{position:fixed;left:12px;bottom:8px;z-index:51;color:#fff;font-size:11px;opacity:.8;pointer-events:none;text-shadow:0 1px 4px #000}
+body.game-active #version{display:none}
 .panel{position:absolute;left:7vw;top:50%;transform:translateY(-50%);max-width:min(600px,88vw)}
 #title .panel,#menu .panel{position:relative;left:auto;top:auto;transform:none;margin:max(4vh,calc((100vh - 620px)/2)) 7vw 4vh}
 .kicker{letter-spacing:.4em;font-size:13px;color:#8fb0d0;margin-bottom:8px}
@@ -98,7 +100,7 @@ body.game-active #menu{display:none!important}
 <div id="hp"><div id="healthLabel" style="font-size:12px;margin-bottom:3px">HP</div><div id="hpbar"><div id="hpfill"></div></div><div id="medkits" style="font-size:12px;margin-top:5px"></div></div>
   <div id="ammo"></div><div id="speedometer" aria-label="車両速度"><div id="speedReadout">0<small>km/h</small></div></div>
 </div>
-<div id="msg"></div><div id="hint"></div>
+<div id="msg"></div><div id="hint"></div><div id="version">Ver. 1.0.0</div>
 <div id="title" class="ov"><div class="panel"><div class="kicker">OPEN CITY ACTION</div><h1>犯人を<span>追え</span></h1><div class="sub">〜シティ・チェイス〜</div><p class="lead">街を走る逃走車を、地上と空から追え。<br>警察官として追跡するか、犯罪者として逃げ切るか、ヘリで捜索するか。<br>山に囲まれた街で、あなたのミッションが始まる。</p><button class="btn record-open">プレイ記録</button><div class="tap">TAP TO START</div></div></div>
 <div id="menu" class="ov"><div class="panel"><div class="kicker">MISSION / ROLE</div><div class="kicker" style="margin-top:10px">役割</div><div id="roles" aria-label="役割を選択"></div><p id="roleDesc" class="lead" style="margin:8px 0 12px"></p><div class="kicker">難易度</div><div id="modes" aria-label="難易度を選択"></div><p id="modeDesc" class="lead" style="margin-top:8px"></p><div class="kicker">プレイモード</div><div id="timeAttackModes" aria-label="プレイモードを選択"></div><p id="timeAttackDesc" class="lead" style="margin:8px 0 12px"></p><button class="btn record-open">プレイ記録</button><button class="btn" id="go">この役割で出動</button><button class="btn" id="setBtn">設定</button>
 <div class="ctl"><b>警察官</b> WASD移動／Eでパトカー乗降／左クリック射撃<br><b>犯罪者</b> WASD運転／マウスで視点操作　警察車両から逃げ切れ<br><b>ヘリ</b> W/S前進・後退／A/D旋回／Space上昇・Shift下降／マウスで照準／左クリック射撃<br>警察官は犯人車を発見して確保、犯罪者は制限時間まで逃走、ヘリは犯人車を見つけて銃で撃て。<br>難易度は各役割で個別に選べます。乗り物に乗ると速度計を表示します。</div></div></div>
@@ -111,7 +113,7 @@ body.game-active #menu{display:none!important}
 (()=>{
 const $=id=>document.getElementById(id),PI=Math.PI,rnd=Math.random,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PITCH=80,RW=14,XS=i=>(i-3)*PITCH,ZS=j=>(j-3)*PITCH,LIM=282,WRAP=282;
-let CFG={sens:1,vol:.8,fov:75,q:1,inv:0,cross:1,csz:6,view:1},MODE='normal',ROLE='police',TIME_ATTACK=false;
+let CFG={sens:1,vol:.8,env:1,fov:75,q:1,inv:0,cross:1,csz:6,view:1},MODE='normal',ROLE='police',TIME_ATTACK=false;
 try{Object.assign(CFG,JSON.parse(localStorage.getItem('cc_cfg')||'{}'));MODE=localStorage.getItem('cc_mode')||'normal';ROLE=localStorage.getItem('cc_role')||'police';TIME_ATTACK=localStorage.getItem('cc_time_attack')==='1'}catch(e){}
 const ROLES={police:{n:'警察官',d:'街を捜索し、逃走車の犯人を見つけて確保する。徒歩とパトカーを使い分けよう。'},criminal:{n:'犯罪者',d:'逃走車を運転して警察の追跡をかわし、制限時間まで逃げ切ろう。'},helicopter:{n:'ヘリ',d:'上空から街を捜索。表示された色と車種を手がかりに犯人車を見つけ、銃で撃って止めよう。'}};
 if(!ROLES[ROLE])ROLE='police';
@@ -228,9 +230,9 @@ function toggleRoadblock(){const distance=5,x=P.x-Math.sin(P.yaw)*distance,z=P.z
 function clearRoadblock(){if(roadblock)S.remove(roadblock.mesh);roadblock=null}
 function useMedkit(){if(!medkits){say('救急箱を持っていません。',1400);return}if(P.hp>=100&&!P.rag){say('HPが満タンです。',1400);return}medkits=0;P.hp=Math.min(100,P.hp+40);P.rag=0;P.vx=0;P.vz=0;P.vy=0;P.y=0;P.ground=true;P.inv=Math.max(P.inv,1);say('救急箱を使用しました。動けるようになりました。HP '+Math.round(P.hp)+'%',2200);saveRunSnapshot()}
 // ---------- audio ----------
-let A=null,mg,nbuf;const eng=[];
+let A=null,mg,nbuf,environmentGain;const eng=[];
 function ainit(){if(A)return;try{A=new(window.AudioContext||window.webkitAudioContext)();mg=A.createGain();mg.gain.value=CFG.vol;mg.connect(A.destination);nbuf=A.createBuffer(1,A.sampleRate,A.sampleRate);const d=nbuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;
-const s=A.createBufferSource();s.buffer=nbuf;s.loop=true;const f=A.createBiquadFilter();f.type='lowpass';f.frequency.value=380;const g=A.createGain();g.gain.value=.05;s.connect(f);f.connect(g);g.connect(mg);s.start();
+const s=A.createBufferSource();s.buffer=nbuf;s.loop=true;const f=A.createBiquadFilter();f.type='lowpass';f.frequency.value=380;environmentGain=A.createGain();environmentGain.gain.value=.05*CFG.env;s.connect(f);f.connect(environmentGain);environmentGain.connect(mg);s.start();
 for(let i=0;i<4;i++){const o=A.createOscillator(),gg=A.createGain(),fl=A.createBiquadFilter();o.type='sawtooth';fl.type='lowpass';fl.frequency.value=320;gg.gain.value=0;o.connect(fl);fl.connect(gg);gg.connect(mg);o.start();eng.push({o,g:gg})}}catch(e){A=null}}
 function nz(dur,freq,type,vol,q){if(!A)return;const s=A.createBufferSource();s.buffer=nbuf;s.loop=true;const f=A.createBiquadFilter();f.type=type||'lowpass';f.frequency.value=freq;f.Q.value=q||1;const g=A.createGain(),t=A.currentTime;g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);s.connect(f);f.connect(g);g.connect(mg);s.start(t);s.stop(t+dur+.05)}
 function tn(freq,dur,type,vol,to){if(!A)return;const o=A.createOscillator(),g=A.createGain(),t=A.currentTime;o.type=type||'sine';o.frequency.setValueAtTime(freq,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+dur);g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(mg);o.start(t);o.stop(t+dur+.05)}
@@ -310,9 +312,9 @@ playRecord.wins+=win?1:0;playRecord.last={mode:MODE,role:ROLE,timeAttack:TIME_AT
 $('endT').textContent=title;$('endP').textContent=txt;$('speedometer').style.display='none';$('end').style.display='flex'}
 $('again').onclick=()=>location.reload();
 // ---------- settings ----------
-const SET=[['vol','音量',0,1,.05],['sens','視点感度',.3,2.5,.1],['fov','視野角',60,100,1],['csz','照準サイズ',2,16,1]];
+const SET=[['vol','音量',0,1,.05],['env','環境音量',0,1,.05],['sens','視点感度',.3,2.5,.1],['fov','視野角',60,100,1],['csz','照準サイズ',2,16,1]];
 function crossShow(){$('cross').style.display=(ROLE==='police'||ROLE==='helicopter')&&(state==='play'||state==='paused')&&(CFG.cross||ROLE==='helicopter'&&zoom>0)?'block':'none'}
-function applyCfg(){R.setPixelRatio(CFG.q);R.setSize(innerWidth,innerHeight);if(mg)mg.gain.value=CFG.vol;const c=$('cross'),w=CFG.cross==2?CFG.csz*3:CFG.csz;c.className=CFG.cross==2?'plus':'';c.style.width=c.style.height=w+'px';c.style.margin='-'+w/2+'px';crossShow();try{localStorage.setItem('cc_cfg',JSON.stringify(CFG))}catch(e){}}
+function applyCfg(){R.setPixelRatio(CFG.q);R.setSize(innerWidth,innerHeight);if(mg)mg.gain.value=CFG.vol;if(environmentGain)environmentGain.gain.value=.05*CFG.env;const c=$('cross'),w=CFG.cross==2?CFG.csz*3:CFG.csz;c.className=CFG.cross==2?'plus':'';c.style.width=c.style.height=w+'px';c.style.margin='-'+w/2+'px';crossShow();try{localStorage.setItem('cc_cfg',JSON.stringify(CFG))}catch(e){}}
 function buildPause(){const p=$('pause'),pz=state==='paused';p.innerHTML='<h2 style="margin:0 0 10px">'+(pz?'一時停止':'設定')+'</h2><div class="set" id="rows"></div><div class="set"><div class="row"><label>照準</label><select id="xs"><option value="0">なし</option><option value="1">ドット</option><option value="2">十字</option></select></div><div class="row"><label>画質</label><select id="qs"><option value="0.75">低</option><option value="1">標準</option><option value="1.5">高</option></select></div><div class="row"><label>Y軸反転</label><select id="inv"><option value="0">OFF</option><option value="1">ON</option></select></div></div><div><button class="btn" id="resume">'+(pz?'再開':'もどる')+'</button>'+(pz?'<button class="btn" id="stop">ホームへ戻る</button>':'')+'</div>';
 const rows=p.querySelector('#rows');SET.forEach(([k,l,mn,mx,st])=>{const d=document.createElement('div');d.className='row';d.innerHTML='<label>'+l+'</label><input type="range" min="'+mn+'" max="'+mx+'" step="'+st+'" value="'+CFG[k]+'"><output>'+CFG[k]+'</output>';const i=d.querySelector('input'),o=d.querySelector('output');i.oninput=()=>{CFG[k]=+i.value;o.textContent=i.value;applyCfg()};rows.appendChild(d)});
 [['xs','cross'],['qs','q'],['inv','inv']].forEach(([id,k])=>{const e=p.querySelector('#'+id);e.value=CFG[k];e.onchange=()=>{CFG[k]=+e.value;applyCfg()}});
@@ -521,7 +523,7 @@ if(state==='play'){
 if(ROLE==='police')while(clueIdx<CLUES.length&&gt>=CLUES[clueIdx][0]){addClue(CLUES[clueIdx][1]());clueIdx++}
 if(gt>=DF.time){if(ROLE==='criminal')end(true,'逃走成功！','警察の追跡をかわし、制限時間まで逃げ切った。');else if(ROLE==='helicopter')end(false,'捜索時間切れ','制限時間内に犯人車を見つけて撃ち止められなかった。');else end(false,'時間切れ','犯人は街の外へ消えた。……もう、追う手がかりはない。')}
 // engine sounds
-if(A&&eng.length){const near=cars.filter(c=>!c.dead&&!c.isPolice).map(c=>[c,Math.hypot(c.x-P.x,c.z-P.z)]).sort((a,b)=>a[1]-b[1]).slice(0,4);eng.forEach((e,i)=>{const n=near[i];if(n&&n[1]<60){e.o.frequency.value=48+n[0].v*7;e.g.gain.value=.05*(1-n[1]/60)}else e.g.gain.value=0});}
+if(A&&eng.length){const near=cars.filter(c=>!c.dead&&!c.isPolice).map(c=>[c,Math.hypot(c.x-P.x,c.z-P.z)]).sort((a,b)=>a[1]-b[1]).slice(0,4);eng.forEach((e,i)=>{const n=near[i];if(n&&n[1]<60){e.o.frequency.value=48+n[0].v*7;e.g.gain.value=.05*CFG.env*(1-n[1]/60)}else e.g.gain.value=0});}
 // hud
 sigT-=dt;if(sigT<=0){sigT=.1;$('time').textContent=TIME_ATTACK?'TA '+fmtT(gt)+' / '+fmtT(DF.time):fmtT(DF.time-gt);$('time').style.color=TIME_ATTACK?'#f2c14e':DF.time-gt<60?'#ff6a5a':'#eef3f8';const healthValue=ROLE==='criminal'?criminalHealth:P.hp;$('healthLabel').textContent=ROLE==='criminal'?'車体耐久':'HP';$('hpfill').style.width=Math.max(0,healthValue)+'%';$('medkits').textContent=ROLE==='police'?'救急箱 '+medkits+' / 1 (Q)':'';$('ammo').innerHTML=(reloadT>0?'RELOAD':ammo)+' <small>/ '+reserve+'</small>';$('stat').innerHTML=ROLES[ROLE].n+'　'+DF.n+(TIME_ATTACK?'　タイムアタック':'')+(ROLE==='police'?'　誤射 '+mist+' / '+DF.mist:ROLE==='criminal'?'　車体 '+criminalHealth+'%':'　高度 '+Math.round(heli.y)+'m')+(ROLE==='police'?'<br>視点 '+(view?'三人称':'一人称')+' (V)':'');const objective=ROLE==='police'?'逃走中の犯人の車を見つけて撃て':ROLE==='criminal'?'警察の追跡から逃れ、制限時間まで走り続けろ':'上空から犯人車を捜索';$('obj').textContent=TIME_ATTACK?objective+'　残り '+fmtT(DF.time-gt):objective;$('suspectInfo').style.display=ROLE==='helicopter'?'block':'none';if(ROLE==='helicopter')$('suspectDescription').textContent=culprit.colName+'色の'+CTYPE[culprit.type];updateSpeedometer();radarPulse+=.1;drawRadar();
 const r=camRay();let bt=1e9,bc=null;cars.forEach(c=>{if(c.dead||c.isPolice||(ROLE==='helicopter'&&!c.culprit))return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c}});$('target').textContent=bc&&bt<(zoom>.5?120:45)?(ROLE==='helicopter'?bc.colName+'色の'+CTYPE[bc.type]:bc.colName+'の'+CTYPE[bc.type]+'　ナンバー '+bc.plate):'';$('cross').classList.toggle('hit',hitFlash>0);$('scope').style.opacity=zoom>.5?1:0;crossShow()}
