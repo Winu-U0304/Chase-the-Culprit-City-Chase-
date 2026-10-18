@@ -147,8 +147,8 @@ body.game-active #menu{display:none!important}
 (()=>{
 const $=id=>document.getElementById(id),PI=Math.PI,rnd=Math.random,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const PITCH=80,RW=14,XS=i=>(i-3)*PITCH,ZS=j=>(j-3)*PITCH,LIM=420,WRAP=420;
-let CFG={sens:1,vol:.8,env:1,fov:75,q:1,inv:0,cross:1,csz:6,view:1},MODE='normal',ROLE='police',TIME_ATTACK=false,TIME_OF_DAY='day';
-try{Object.assign(CFG,JSON.parse(localStorage.getItem('cc_cfg')||'{}'));MODE=localStorage.getItem('cc_mode')||'normal';ROLE=localStorage.getItem('cc_role')||'police';TIME_ATTACK=localStorage.getItem('cc_time_attack')==='1';TIME_OF_DAY=localStorage.getItem('cc_time_of_day')||'day'}catch(e){}
+let CFG={sens:1,vol:.8,env:1,fov:75,q:1,inv:0,cross:1,csz:6,view:1},MODE='normal',ROLE='police',TIME_ATTACK=false,HARDCORE=false,TIME_OF_DAY='day';
+try{Object.assign(CFG,JSON.parse(localStorage.getItem('cc_cfg')||'{}'));MODE=localStorage.getItem('cc_mode')||'normal';ROLE=localStorage.getItem('cc_role')||'police';TIME_ATTACK=localStorage.getItem('cc_time_attack')==='1';HARDCORE=localStorage.getItem('cc_hardcore')==='1';TIME_OF_DAY=localStorage.getItem('cc_time_of_day')||'day'}catch(e){}
 if(TIME_OF_DAY!=='day'&&TIME_OF_DAY!=='night')TIME_OF_DAY='day';
 const ROLES={police:{n:'警察官',d:'街を捜索し、逃走車の犯人を見つけて確保する。徒歩とパトカーを使い分けよう。'},criminal:{n:'犯罪者',d:'逃走車を運転して警察の追跡をかわし、制限時間まで逃げ切ろう。'},helicopter:{n:'ヘリ',d:'上空から街を捜索。表示された色と車種を手がかりに犯人車を見つけ、銃で撃って止めよう。'}};
 if(!ROLES[ROLE])ROLE='police';
@@ -252,14 +252,35 @@ imesh(new THREE.CylinderGeometry(.22,.38,3.2,10),lm(0x5a3a22),TREES.map(t=>[t[0]
 function buildMountainRing(){
  const geo=new THREE.ConeGeometry(1,1,14,1),groups=[[],[],[]],mats=[lm(0x4b633e),lm(0x596b43),lm(0x6d674c)];
  const roads=Array.from({length:7},(_,i)=>ZS(i));
+ const overlapsTunnel=(x,z,r)=>{
+  const tunnelStart=266,tunnelEnd=398,clearance=RW/2+5;
+  for(let i=0;i<7;i++)for(const edge of[-1,1])for(const axis of['x','z']){
+   const along=axis==='x'?x:z,lateral=axis==='x'?z-roads[i]:x-XS(i),nearest=clamp(along,edge===1?tunnelStart:-tunnelEnd,edge===1?tunnelEnd:-tunnelStart);
+   if(Math.hypot(along-nearest,lateral)<r+clearance)return true;
+  }
+  return false
+ };
  const addBand=(edge,axis)=>{for(let i=-12;i<=12;i++){
   const along=i*31+(rnd()-.5)*13,h=58+rnd()*82,r=34+rnd()*20,x=axis==='x'?edge:along,z=axis==='z'?edge:along;
-  if(roads.some(road=>Math.abs(along-road)<r+RW/2+3))continue;
+  if(roads.some(road=>Math.abs(along-road)<r+RW/2+3)||overlapsTunnel(x,z,r))continue;
   groups[(i+12)%3].push([x,h/2,z,0,(rnd()-.5)*.25,0,r,h,r])
  }};
  addBand(-332,'x');addBand(332,'x');addBand(-332,'z');addBand(332,'z');
+ for(let i=0;i<7;i++)for(const edge of[-1,1])for(const axis of['x','z']){
+  const lane=axis==='x'?roads[i]:XS(i),center=edge*332;
+  for(let j=-1;j<=1;j++){
+   const radius=36+rnd()*12,height=62+rnd()*34,along=center+j*38;
+   const x=axis==='x'?along:lane,z=axis==='x'?lane:along;
+   if(!overlapsTunnel(x,z,radius))groups[(i+j+3)%3].push([x,height/2,z,0,(rnd()-.5)*.18,0,radius,height,radius]);
+  }
+  for(const side of[-1,1]){
+   const radius=27+rnd()*10,height=48+rnd()*30,along=center+(rnd()-.5)*30,lateral=lane+side*(28+radius*.25);
+   const x=axis==='x'?along:lateral,z=axis==='x'?lateral:along;
+   if(!overlapsTunnel(x,z,radius))groups[(i+side+4)%3].push([x,height/2,z,0,(rnd()-.5)*.2,0,radius,height,radius]);
+  }
+ }
  groups.forEach((items,i)=>{if(items.length){const im=new THREE.InstancedMesh(geo,mats[i],items.length);items.forEach((it,k)=>{dummy.position.set(it[0],it[1],it[2]);dummy.rotation.set(it[3],it[4],it[5]);dummy.scale.set(it[6],it[7],it[8]);dummy.updateMatrix();im.setMatrixAt(k,dummy.matrix)});im.instanceMatrix.needsUpdate=true;S.add(im)}});
- const tunnelMat=new THREE.MeshLambertMaterial({color:0x343a40,side:THREE.DoubleSide}),portalMat=lm(0x77766f),side=RW/2+1,length=132;
+ const tunnelMat=new THREE.MeshLambertMaterial({color:0x343a40,side:THREE.DoubleSide}),innerTunnelMat=new THREE.MeshBasicMaterial({color:0x000000,side:THREE.DoubleSide}),portalMat=lm(0x77766f),side=RW/2+1,length=132;
  function addTunnel(axis,edge,lane){
   const center=edge*332,start=center-length/2,end=center+length/2,segments=24,arcSteps=16,positions=[],indices=[];
   for(let i=0;i<=segments;i++){const along=start+(end-start)*i/segments;for(let j=0;j<=arcSteps;j++){
@@ -268,6 +289,13 @@ function buildMountainRing(){
   }}
   for(let i=0;i<segments;i++)for(let j=0;j<arcSteps;j++){const a=i*(arcSteps+1)+j,b=a+arcSteps+1;indices.push(a,b,a+1,b,b+1,a+1)}
   const roof=new THREE.BufferGeometry();roof.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));roof.setIndex(indices);roof.computeVertexNormals();S.add(new THREE.Mesh(roof,tunnelMat));
+  const innerRadius=side-.18,innerPositions=[],innerIndices=[];
+  for(let i=0;i<=segments;i++){const along=start+(end-start)*i/segments;for(let j=0;j<=arcSteps;j++){
+   const angle=PI*j/arcSteps,lat=innerRadius*Math.cos(angle),y=innerRadius*Math.sin(angle);
+   innerPositions.push(axis==='x'?along:lane+lat,y,axis==='x'?lane+lat:along);
+  }}
+  for(let i=0;i<segments;i++)for(let j=0;j<arcSteps;j++){const a=i*(arcSteps+1)+j,b=a+arcSteps+1;innerIndices.push(a,b,a+1,b,b+1,a+1)}
+  const innerRoof=new THREE.BufferGeometry();innerRoof.setAttribute('position',new THREE.Float32BufferAttribute(innerPositions,3));innerRoof.setIndex(innerIndices);innerRoof.computeVertexNormals();S.add(new THREE.Mesh(innerRoof,innerTunnelMat));
   const ring=new THREE.Mesh(new THREE.TorusGeometry(side,.8,8,24,PI),portalMat);
   for(const along of[start,end]){const portal=ring.clone();portal.position.set(axis==='x'?along:lane,0,axis==='x'?lane:along);if(axis==='x')portal.rotation.y=PI/2;S.add(portal)}
  }
@@ -463,19 +491,29 @@ else if(car){x=car.x+Math.sin(car.psi)*2.4;y=.9;z=car.z+Math.cos(car.psi)*2.4;dx
 else{const cp=Math.cos(P.pitch);x=P.x;y=P.y+1.5;z=P.z;dx=-Math.sin(P.yaw)*cp;dy=Math.sin(P.pitch);dz=-Math.cos(P.yaw)*cp;power=1.6;ang=.38;dist=55}
 torch.position.set(x,y,z);torch.target.position.set(x+dx*10,y+dy*10,z+dz*10);torch.intensity=power;torch.angle=ang;torch.distance=dist}
 function setMode(m){MODE=m;DF=DFS[m];try{localStorage.setItem('cc_mode',m)}catch(e){}$('modeDesc').textContent=DF.d;$('radar').style.display=DF.radar===false?'none':'block';[...$('modes').children].forEach(b=>b.classList.toggle('on',b.dataset.m===m))}
-function setTimeAttack(enabled){TIME_ATTACK=enabled;try{localStorage.setItem('cc_time_attack',enabled?'1':'0')}catch(e){}$('timeAttackDesc').textContent=enabled?'役割ミッションをクリアしてベストタイム更新を目指そう。制限時間内にクリアできないと失敗。':'通常モード。これまで通りスコアを記録する。';[...$('timeAttackModes').children].forEach(b=>b.classList.toggle('on',(b.dataset.timeAttack==='1')===enabled))}
-function setRole(role){ROLE=role;try{localStorage.setItem('cc_role',role)}catch(e){}$('roleDesc').textContent=ROLES[role].d;$('go').textContent=ROLES[role].n+'として出動';[...$('roles').children].forEach(b=>b.classList.toggle('on',b.dataset.role===role))}
-$('roles').innerHTML=Object.keys(ROLES).map(role=>'<button class="btn" data-role="'+role+'">'+ROLES[role].n+'</button>').join('');$('roles').onclick=e=>{const role=e.target.dataset&&e.target.dataset.role;if(role)setRole(role)};setRole(ROLE);
+function updatePlayModeUI(){
+ const timeAttackButton=$('timeAttackModes').querySelector('[data-play-mode="timeAttack"]'),hardcoreButton=$('timeAttackModes').querySelector('[data-play-mode="hardcore"]');
+ if(timeAttackButton)timeAttackButton.style.display=ROLE==='criminal'?'none':'';
+ if(hardcoreButton)hardcoreButton.style.display=ROLE==='police'?'':'none';
+ $('timeAttackDesc').textContent=HARDCORE?'警察官専用。民間車に1発でも誤射すると即ゲームオーバー。':TIME_ATTACK?'役割ミッションをクリアしてベストタイム更新を目指そう。制限時間内にクリアできないと失敗。':'通常モード。これまで通りスコアを記録する。';
+ [...$('timeAttackModes').children].forEach(button=>button.classList.toggle('on',(button.dataset.playMode==='hardcore'&&HARDCORE)||(button.dataset.playMode==='timeAttack'&&TIME_ATTACK)||(button.dataset.playMode==='normal'&&!TIME_ATTACK&&!HARDCORE)));
+}
+function setTimeAttack(enabled){TIME_ATTACK=enabled&&ROLE!=='criminal';if(TIME_ATTACK)HARDCORE=false;try{localStorage.setItem('cc_time_attack',TIME_ATTACK?'1':'0')}catch(e){}updatePlayModeUI()}
+function setHardcore(enabled){HARDCORE=enabled&&ROLE==='police';if(HARDCORE)TIME_ATTACK=false;try{localStorage.setItem('cc_hardcore',HARDCORE?'1':'0')}catch(e){}updatePlayModeUI()}
+function setPlayMode(mode){setTimeAttack(mode==='timeAttack');setHardcore(mode==='hardcore')}
+function setRole(role){ROLE=role;if(role==='criminal'){TIME_ATTACK=false;HARDCORE=false}else if(role!=='police')HARDCORE=false;try{localStorage.setItem('cc_role',role);localStorage.setItem('cc_time_attack',TIME_ATTACK?'1':'0');localStorage.setItem('cc_hardcore',HARDCORE?'1':'0')}catch(e){}$('roleDesc').textContent=ROLES[role].d;$('go').textContent=ROLES[role].n+'として出動';[...$('roles').children].forEach(b=>b.classList.toggle('on',b.dataset.role===role));updatePlayModeUI()}
+$('roles').innerHTML=Object.keys(ROLES).map(role=>'<button class="btn" data-role="'+role+'">'+ROLES[role].n+'</button>').join('');$('roles').onclick=e=>{const role=e.target.dataset&&e.target.dataset.role;if(role)setRole(role)};
 $('timeOfDayModes').innerHTML='<button class="btn" data-time-of-day="day">昼</button><button class="btn" data-time-of-day="night">夜</button>';$('timeOfDayModes').onclick=e=>{const button=e.target.closest('[data-time-of-day]');if(button)setTimeOfDay(button.dataset.timeOfDay)};setTimeOfDay(TIME_OF_DAY);
 $('modes').innerHTML=Object.keys(DFS).map(m=>'<button class="btn" data-m="'+m+'">'+DFS[m].n+'</button>').join('');$('modes').onclick=e=>{const m=e.target.dataset&&e.target.dataset.m;if(m)setMode(m)};setMode(MODE);
-$('timeAttackModes').innerHTML='<button class="btn" data-time-attack="0">通常</button><button class="btn" data-time-attack="1">タイムアタック</button>';$('timeAttackModes').onclick=e=>{const button=e.target.closest('[data-time-attack]');if(button)setTimeAttack(button.dataset.timeAttack==='1')};setTimeAttack(TIME_ATTACK);
+$('timeAttackModes').innerHTML='<button class="btn" data-play-mode="normal">通常</button><button class="btn" data-play-mode="timeAttack">タイムアタック</button><button class="btn" data-play-mode="hardcore">ハードコア</button>';$('timeAttackModes').onclick=e=>{const button=e.target.closest('[data-play-mode]');if(button)setPlayMode(button.dataset.playMode)};
+setRole(ROLE);setTimeAttack(TIME_ATTACK);setHardcore(HARDCORE);
 try{const saved=JSON.parse(localStorage.getItem('cc_record')||'null');if(saved&&Number.isFinite(saved.plays)&&Number.isFinite(saved.wins))playRecord=saved}catch(e){}
 if(!Array.isArray(playRecord.history))playRecord.history=[];
 if(!Array.isArray(playRecord.trash))playRecord.trash=[];
 playRecord.history.forEach(record=>{if(record&&!record.role)record.role='police'});playRecord.trash.forEach(record=>{if(record&&!record.role)record.role='police'});
 function savePlayRecord(){try{localStorage.setItem('cc_record',JSON.stringify(playRecord))}catch(e){}}
 if(playRecord.history.some(record=>record&&record.status==='playing')){playRecord.history.forEach(record=>{if(record&&record.status==='playing')record.status='interrupted'});savePlayRecord()}
-if(!playRecord.history.length&&playRecord.last&&Number.isFinite(playRecord.last.time)){playRecord.history.push({number:playRecord.plays,mode:playRecord.last.mode,role:playRecord.last.role||'police',timeAttack:!!playRecord.last.timeAttack,status:playRecord.last.win?'win':'loss',time:playRecord.last.time,score:playRecord.last.score||0,date:null});savePlayRecord()}
+if(!playRecord.history.length&&playRecord.last&&Number.isFinite(playRecord.last.time)){playRecord.history.push({number:playRecord.plays,mode:playRecord.last.mode,role:playRecord.last.role||'police',timeAttack:!!playRecord.last.timeAttack,hardcore:!!playRecord.last.hardcore,status:playRecord.last.win?'win':'loss',time:playRecord.last.time,score:playRecord.last.score||0,date:null});savePlayRecord()}
 function renderPlayRecord(){let best='',timeBest=0;try{best=Object.keys(DFS).map(m=>{const score=Number(localStorage.getItem('cc_best_'+ROLE+'_'+m))||(ROLE==='police'?Number(localStorage.getItem('cc_best_'+m)):0);return DFS[m].n+' '+(score>0?score:'—')}).join('　');timeBest=Number(localStorage.getItem('cc_besttime_'+ROLE+'_'+MODE))||0}catch(e){best='記録を読み込めません'}
 $('recordsSummary').textContent=recordView==='active'?'プレイ回数 '+playRecord.plays+'回　クリア '+playRecord.wins+'回\n最高スコア　'+best+(TIME_ATTACK?'\n'+ROLES[ROLE].n+'・'+DF.n+' 最速タイム　'+(timeBest?fmtT(timeBest):'—'):''):'ゴミ箱 '+playRecord.trash.length+'件';
 const toolbar=$('recordsToolbar');toolbar.replaceChildren();
@@ -488,7 +526,7 @@ if(selectingRecords){addAction('選択した記録をゴミ箱へ',moveSelectedR
 const list=$('recordList');list.replaceChildren();
 const records=recordView==='active'?playRecord.history:playRecord.trash;
 if(!records.length){const empty=document.createElement('div');empty.className='record-empty';empty.textContent=recordView==='active'?'プレイ記録はまだありません。':'ゴミ箱は空です。';list.appendChild(empty);updateSelectedCount();return}
-records.map((record,index)=>({record,index})).reverse().forEach(({record,index})=>{const row=document.createElement('div');row.className='record-entry'+(record.status==='win'?' win':'');const mode=(DFS[record.mode]?DFS[record.mode].n:'不明')+(record.timeAttack?'・タイムアタック':'');const status=record.status==='win'?'クリア':record.status==='loss'?'未クリア':record.status==='stopped'?'ホームへ戻った':record.status==='interrupted'?'中断':'プレイ中';const date=Number.isFinite(record.date)?new Date(record.date).toLocaleString():'日時不明';const head=document.createElement('div');head.className='record-entry-head';
+records.map((record,index)=>({record,index})).reverse().forEach(({record,index})=>{const row=document.createElement('div');row.className='record-entry'+(record.status==='win'?' win':'');const mode=(DFS[record.mode]?DFS[record.mode].n:'不明')+(record.hardcore?'・ハードコア':record.timeAttack?'・タイムアタック':'');const status=record.status==='win'?'クリア':record.status==='loss'?'未クリア':record.status==='stopped'?'ホームへ戻った':record.status==='interrupted'?'中断':'プレイ中';const date=Number.isFinite(record.date)?new Date(record.date).toLocaleString():'日時不明';const head=document.createElement('div');head.className='record-entry-head';
 if(recordView==='active'&&selectingRecords){const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.className='record-select';checkbox.dataset.recordIndex=index;checkbox.setAttribute('aria-label',(record.number||index+1)+'回目の記録を選択');head.appendChild(checkbox)}
 const role=ROLES[record.role||'police']||ROLES.police;const text=document.createElement('div');text.textContent=(record.number||index+1)+'回目　'+date+'\n'+role.n+'・'+mode+' / '+status+' / TIME '+fmtT(record.time||0)+(record.status==='win'?' / SCORE '+record.score:'');head.appendChild(text);row.appendChild(head);
 const controls=document.createElement('div');controls.className='record-entry-controls';
@@ -526,18 +564,18 @@ try{localStorage.removeItem('cc_record');Object.keys(DFS).forEach(mode=>{localSt
 catch(e){alert('記録を削除できませんでした。ブラウザーの保存領域を確認してください。');return}
 playRecord={plays:0,wins:0,last:null,history:[],trash:[]};activeRecord=null;recordView='active';selectingRecords=false;renderPlayRecord()}
 $('deleteRecords').onclick=deletePlayRecords;
-function saveRunSnapshot(){if(!activeRecord)return;activeRecord.time=Math.round(gt);activeRecord.role=ROLE;activeRecord.timeAttack=TIME_ATTACK;activeRecord.timeOfDay=TIME_OF_DAY;activeRecord.snapshot={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,timeOfDay:TIME_OF_DAY,gt,player:{...P},vehicleLook:{...vehicleLook},ammo,reserve,reloadT,shotCd,mist,shots,hitsN,clueIdx,view,medkits,inPoliceCar,inCriminalCar,criminalHealth,heli:{...heli},policeDamage,policeDisabled,repairT,tscale,killed,endT,roadblock:roadblock?{x:roadblock.x,z:roadblock.z,yaw:roadblock.yaw}:null,cars:cars.map(({g,lights,...c})=>({...c})),pickups:pick.map(({m,...p})=>({...p})),clues:[...$('clues').children].map(d=>d.textContent)};savePlayRecord()}
-function activateRun(record){activeRecord=record;record.status='playing';setMode(record.mode);setRole(record.role||record.snapshot.role||'police');setTimeAttack(!!(record.timeAttack||record.snapshot.timeAttack));setTimeOfDay(record.timeOfDay||record.snapshot.timeOfDay||TIME_OF_DAY);document.body.classList.add('game-active');$('menu').style.display='none';$('title').style.display='none';$('records').style.display='none';$('pause').style.display='none';$('end').style.display='none';const snap=record.snapshot;
+function saveRunSnapshot(){if(!activeRecord)return;activeRecord.time=Math.round(gt);activeRecord.role=ROLE;activeRecord.timeAttack=TIME_ATTACK;activeRecord.hardcore=HARDCORE;activeRecord.timeOfDay=TIME_OF_DAY;activeRecord.snapshot={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,hardcore:HARDCORE,timeOfDay:TIME_OF_DAY,gt,player:{...P},vehicleLook:{...vehicleLook},ammo,reserve,reloadT,shotCd,mist,shots,hitsN,clueIdx,view,medkits,inPoliceCar,inCriminalCar,criminalHealth,heli:{...heli},policeDamage,policeDisabled,repairT,tscale,killed,endT,roadblock:roadblock?{x:roadblock.x,z:roadblock.z,yaw:roadblock.yaw}:null,cars:cars.map(({g,lights,...c})=>({...c})),pickups:pick.map(({m,...p})=>({...p})),clues:[...$('clues').children].map(d=>d.textContent)};savePlayRecord()}
+function activateRun(record){activeRecord=record;record.status='playing';setMode(record.mode);setRole(record.role||record.snapshot.role||'police');setTimeAttack(!!(record.timeAttack||record.snapshot.timeAttack));setHardcore(!!(record.hardcore||record.snapshot.hardcore));setTimeOfDay(record.timeOfDay||record.snapshot.timeOfDay||TIME_OF_DAY);document.body.classList.add('game-active');$('menu').style.display='none';$('title').style.display='none';$('records').style.display='none';$('pause').style.display='none';$('end').style.display='none';const snap=record.snapshot;
 gt=snap.gt;Object.assign(P,snap.player);Object.assign(vehicleLook,snap.vehicleLook||{yaw:0,pitch:0});ammo=snap.ammo;reserve=snap.reserve;reloadT=snap.reloadT;shotCd=snap.shotCd;mist=snap.mist;shots=snap.shots;hitsN=snap.hitsN;clueIdx=snap.clueIdx;view=snap.view;medkits=snap.medkits||0;inPoliceCar=!!snap.inPoliceCar;inCriminalCar=!!snap.inCriminalCar;criminalHealth=snap.criminalHealth||100;Object.assign(heli,snap.heli||{});if(!snap.heli||!Number.isFinite(snap.heli.vx))heli.vx=Math.sin(heli.yaw)*heli.v;if(!snap.heli||!Number.isFinite(snap.heli.vz))heli.vz=Math.cos(heli.yaw)*heli.v;if(!snap.heli||!Number.isFinite(snap.heli.turnV))heli.turnV=0;policeDamage=snap.policeDamage||0;policeDisabled=!!snap.policeDisabled;repairT=snap.repairT||0;collisionCd=0;driveSteer=0;ramCd=0;zoom=0;tscale=snap.tscale||1;killed=!!snap.killed;endT=snap.endT||0;cars.forEach(c=>S.remove(c.g));cars.length=0;culprit=null;policeCar=null;criminalPolice=[];clearRoadblock();
 snap.cars.forEach(saved=>{const c=mkCar({type:saved.type,col:[saved.col,saved.colName],culprit:saved.culprit,police:saved.isPolice});Object.assign(c,saved,{g:c.g});c.g.position.set(c.x,0,c.z);c.g.rotation.y=c.psi;c.g.rotation.z=c.tilt||0;cars.push(c);if(c.culprit)culprit=c;if(c.isPolice){policeCar=policeCar||c;criminalPolice.push(c)}});
 if(!policeCar)addPoliceCar();if(ROLE==='criminal')addCriminalPoliceFleet(criminalPoliceTarget());policeCar.g.visible=!inPoliceCar;if(culprit)culprit.g.visible=true;heliModel.visible=ROLE==='helicopter';heliModel.position.set(heli.x,heli.y,heli.z);heliModel.rotation.y=heli.yaw;
 mkPickups(snap.pickups||[]);if(snap.roadblock)placeRoadblock(snap.roadblock.x,snap.roadblock.z,snap.roadblock.yaw);$('clues').replaceChildren(...(snap.clues||[]).map(text=>{const clue=document.createElement('div');clue.textContent=text;return clue}));recordSaveT=gt;state='play';$('hud').style.display='block';$('speedometer').style.display=ROLE==='helicopter'?'grid':'none';$('ammo').style.display=(ROLE==='police'||ROLE==='helicopter')?'block':'none';$('hp').style.display=ROLE==='helicopter'?'none':'block';$('clues').style.display=ROLE==='police'?'block':'none';$('hint').textContent='';updateSpeedometer();crossShow();applyCfg();saveRunSnapshot();requestViewControl()}
 function continueRun(index){const record=playRecord.history[index];if(record&&record.snapshot)activateRun(record)}
-function startGame(){ainit();document.body.classList.add('game-active');P.x=-20;P.z=-20;P.y=0;P.vy=0;P.yaw=0;P.pitch=-.1;P.hp=100;P.inv=0;P.rag=0;P.ground=true;P.walk=0;vehicleLook.yaw=0;vehicleLook.pitch=0;gt=0;ammo=12;reserve=48;reloadT=0;shotCd=0;mist=0;shots=0;hitsN=0;medkits=0;criminalHealth=100;inPoliceCar=false;inCriminalCar=false;policeDamage=0;policeDisabled=false;repairT=0;collisionCd=0;driveSteer=0;ramCd=0;clearRoadblock();tscale=1;killed=false;clueIdx=0;heli.x=-20;heli.z=-20;heli.y=86;heli.yaw=0;heli.v=0;heli.vy=0;heli.vx=0;heli.vz=0;heli.turnV=0;playRecord.plays++;activeRecord={number:playRecord.plays,mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,timeOfDay:TIME_OF_DAY,status:'playing',time:0,score:0,date:Date.now(),snapshot:null};playRecord.history.push(activeRecord);playRecord.last={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,timeOfDay:TIME_OF_DAY,win:false,score:0,time:0};$('clues').innerHTML='';spawnTraffic();mkPickups();cars.forEach(c=>{if(!c.isPolice)c.v=c.cruise*.6});heliModel.visible=ROLE==='helicopter';heliModel.position.set(heli.x,heli.y,heli.z);$('ammo').style.display=(ROLE==='police'||ROLE==='helicopter')?'block':'none';$('hp').style.display=ROLE==='helicopter'?'none':'block';$('clues').style.display=ROLE==='police'?'block':'none';if(ROLE==='criminal'){inCriminalCar=true;culprit.v=0;P.x=culprit.x;P.z=culprit.z;P.yaw=culprit.psi+PI;culprit.g.visible=true;policeCar.x=clamp(-culprit.x,-220,220);policeCar.z=clamp(-culprit.z,-220,220);if(Math.hypot(policeCar.x-culprit.x,policeCar.z-culprit.z)<100){policeCar.x=clamp(culprit.x+180,-220,220);policeCar.z=clamp(culprit.z+140,-220,220)}policeCar.g.position.set(policeCar.x,0,policeCar.z);policeCar.g.visible=true;addCriminalPoliceFleet(criminalPoliceTarget())}else if(ROLE==='helicopter'){P.x=heli.x;P.z=heli.z;P.y=heli.y;P.pitch=-.32;view=0}else{P.y=0;policeCar.g.visible=true}recordSaveT=0;saveRunSnapshot();renderPlayRecord();state='play';$('hud').style.display='block';$('speedometer').style.display=ROLE==='helicopter'?'grid':'none';crossShow();applyCfg();requestViewControl();const msg=ROLE==='police'?'犯人を探し出せ！ 無線に耳を傾けろ。':ROLE==='criminal'?'逃走車を運転し、警察の追跡から逃げ切れ！':'犯人車を見つけ出し、左クリックで撃って止めろ！';say(msg,3500)}
+function startGame(){ainit();document.body.classList.add('game-active');P.x=-20;P.z=-20;P.y=0;P.vy=0;P.yaw=0;P.pitch=-.1;P.hp=100;P.inv=0;P.rag=0;P.ground=true;P.walk=0;vehicleLook.yaw=0;vehicleLook.pitch=0;gt=0;ammo=12;reserve=48;reloadT=0;shotCd=0;mist=0;shots=0;hitsN=0;medkits=0;criminalHealth=100;inPoliceCar=false;inCriminalCar=false;policeDamage=0;policeDisabled=false;repairT=0;collisionCd=0;driveSteer=0;ramCd=0;clearRoadblock();tscale=1;killed=false;clueIdx=0;heli.x=-20;heli.z=-20;heli.y=86;heli.yaw=0;heli.v=0;heli.vy=0;heli.vx=0;heli.vz=0;heli.turnV=0;playRecord.plays++;activeRecord={number:playRecord.plays,mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,hardcore:HARDCORE,timeOfDay:TIME_OF_DAY,status:'playing',time:0,score:0,date:Date.now(),snapshot:null};playRecord.history.push(activeRecord);playRecord.last={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,hardcore:HARDCORE,timeOfDay:TIME_OF_DAY,win:false,score:0,time:0};$('clues').innerHTML='';spawnTraffic();mkPickups();cars.forEach(c=>{if(!c.isPolice)c.v=c.cruise*.6});heliModel.visible=ROLE==='helicopter';heliModel.position.set(heli.x,heli.y,heli.z);$('ammo').style.display=(ROLE==='police'||ROLE==='helicopter')?'block':'none';$('hp').style.display=ROLE==='helicopter'?'none':'block';$('clues').style.display=ROLE==='police'?'block':'none';if(ROLE==='criminal'){inCriminalCar=true;culprit.v=0;P.x=culprit.x;P.z=culprit.z;P.yaw=culprit.psi+PI;culprit.g.visible=true;policeCar.x=clamp(-culprit.x,-220,220);policeCar.z=clamp(-culprit.z,-220,220);if(Math.hypot(policeCar.x-culprit.x,policeCar.z-culprit.z)<100){policeCar.x=clamp(culprit.x+180,-220,220);policeCar.z=clamp(culprit.z+140,-220,220)}policeCar.g.position.set(policeCar.x,0,policeCar.z);policeCar.g.visible=true;addCriminalPoliceFleet(criminalPoliceTarget())}else if(ROLE==='helicopter'){P.x=heli.x;P.z=heli.z;P.y=heli.y;P.pitch=-.32;view=0}else{P.y=0;policeCar.g.visible=true}recordSaveT=0;saveRunSnapshot();renderPlayRecord();state='play';$('hud').style.display='block';$('speedometer').style.display=ROLE==='helicopter'?'grid':'none';crossShow();applyCfg();requestViewControl();const msg=ROLE==='police'?'犯人を探し出せ！ 無線に耳を傾けろ。':ROLE==='criminal'?'逃走車を運転し、警察の追跡から逃げ切れ！':'犯人車を見つけ出し、左クリックで撃って止めろ！';say(msg,3500)}
 $('go').onclick=startGame;
 function end(win,title,txt){if(state==='end')return;state='end';document.body.classList.remove('game-active');document.exitPointerLock&&document.exitPointerLock();$('hud').style.display='none';$('cross').style.display='none';$('scope').style.opacity=0;$('target').textContent='';let best='',sc=0;const acc=shots?Math.round(hitsN/shots*100):0;
 if(win){sc=Math.round(5000+(DF.time-gt)*8+P.hp*20+(DF.mist-mist)*300+acc*10);try{if(TIME_ATTACK){const key='cc_besttime_'+ROLE+'_'+MODE,old=Number(localStorage.getItem(key))||0,elapsed=Math.round(gt);if(!old||elapsed<old){localStorage.setItem(key,String(elapsed));best='　最速タイム更新！'}else best='　最速 '+fmtT(old)}else{const k='cc_best_'+ROLE+'_'+MODE,b=Number(localStorage.getItem(k))||(ROLE==='police'?Number(localStorage.getItem('cc_best_'+MODE)):0);if(sc>b){localStorage.setItem(k,sc);best='　ハイスコア更新！'}else best='　ハイスコア '+b}}catch(e){best='　記録を保存できなかった'}$('endS').textContent=TIME_ATTACK?'TIME ATTACK　'+fmtT(gt)+'　'+ROLES[ROLE].n+best:'SCORE '+sc+'　TIME '+fmtT(gt)+'　'+ROLES[ROLE].n+best}else $('endS').textContent=(TIME_ATTACK?'TIME ATTACK　':'')+ROLES[ROLE].n+'　TIME '+fmtT(gt);
-playRecord.wins+=win?1:0;playRecord.last={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,win,score:sc,time:Math.round(gt)};if(activeRecord){activeRecord.role=ROLE;activeRecord.timeAttack=TIME_ATTACK;activeRecord.status=win?'win':'loss';activeRecord.time=Math.round(gt);activeRecord.score=sc;activeRecord.snapshot=null;activeRecord=null}savePlayRecord();renderPlayRecord();
+playRecord.wins+=win?1:0;playRecord.last={mode:MODE,role:ROLE,timeAttack:TIME_ATTACK,hardcore:HARDCORE,win,score:sc,time:Math.round(gt)};if(activeRecord){activeRecord.role=ROLE;activeRecord.timeAttack=TIME_ATTACK;activeRecord.hardcore=HARDCORE;activeRecord.status=win?'win':'loss';activeRecord.time=Math.round(gt);activeRecord.score=sc;activeRecord.snapshot=null;activeRecord=null}savePlayRecord();renderPlayRecord();
 $('endT').textContent=title;$('endP').textContent=txt;$('speedometer').style.display='none';$('end').style.display='flex'}
 $('again').onclick=()=>location.reload();
 // ---------- settings ----------
@@ -579,7 +617,7 @@ let wt=250;BL.forEach(b=>{const t=rayBox(r.o,r.d,b[0],b[1],0,b[4],b[2],b[3]);if(
 if(bc&&bt<wt&&bt<220){const hx=r.o[0]+r.d[0]*bt,hy=r.o[1]+r.d[1]*bt,hz=r.o[2]+r.d[2]*bt;fx(hx,hy,hz,0xffe080,6,5,.4);hitsN++;hitFlash=.15;hitCar(bc,crit?2:1)}
 else if(wt<250){fx(r.o[0]+r.d[0]*wt,r.o[1]+r.d[1]*wt,r.o[2]+r.d[2]*wt,0xcccccc,4,3,.35,.08)}}
 function hitCar(c,n){if(c.culprit){c.hp-=n;c.panic=6;nz(.15,500,'lowpass',.4);if(c.hp<=0){boom(c);if(ROLE==='helicopter')end(true,'犯人車を撃破！','ヘリからの射撃で逃走車を停止させた。')}else say(c.hp<=3?'効いている！もう少しだ！':'命中！ 犯人の車だ！',1500)}
-else{mist++;c.panic=8;c.hp-=n;horn(1);say('民間人の車だ！誤射 '+mist+' / '+DF.mist,2200);$('flash').style.opacity=.35;setTimeout(()=>$('flash').style.opacity=0,200);if(mist>=DF.mist)end(false,'市民への誤射','何度も無関係な車を撃ってしまった。……任務は、打ち切られた。')}}
+else{mist++;c.panic=8;c.hp-=n;horn(1);say('民間人の車だ！誤射 '+mist+' / '+DF.mist,2200);$('flash').style.opacity=.35;setTimeout(()=>$('flash').style.opacity=0,200);if(HARDCORE){end(false,'ハードコア失敗','民間車への誤射により、任務は即時終了した。');return}if(mist>=DF.mist)end(false,'市民への誤射','何度も無関係な車を撃ってしまった。……任務は、打ち切られた。')}}
 function boom(c){c.dead=true;c.v=0;killed=true;endT=2.4;tscale=.3;nz(1.4,300,'lowpass',1);tn(80,1.6,'sawtooth',.4,25);fx(c.x,1.4,c.z,0xff9a2a,40,14,1.4,.3);fx(c.x,1.4,c.z,0x444444,30,8,2.2,.4);fx(c.x,1.2,c.z,0xffe080,20,18,.8,.2);c.g.traverse(o=>{if(o.material&&o.material.color&&!o.userData.shadow)o.material=lm(0x222222)});c.g.rotation.z=.25;say('犯人の車が爆発した！',3000)}
 // ---------- cars update ----------
 function nextStop(c){let i,j,dist;if(c.dir===0){i=Math.ceil((c.x+2.2+8.5-.2)/PITCH)+3;j=c.road;dist=XS(i)-8.5-(c.x+2.2)}else if(c.dir===1){i=Math.floor((c.x-2.2-8.5+.2)/PITCH)+3;j=c.road;dist=(c.x-2.2)-(XS(i)+8.5)}else if(c.dir===2){j=Math.ceil((c.z+2.2+8.5-.2)/PITCH)+3;i=c.road;dist=ZS(j)-8.5-(c.z+2.2)}else{j=Math.floor((c.z-2.2-8.5+.2)/PITCH)+3;i=c.road;dist=(c.z-2.2)-(ZS(j)+8.5)}
@@ -617,6 +655,24 @@ function carOverlapsBuilding(x,z,ex,ez,b){
  return dx*dx+dz*dz<radius*radius
 }
 const bAt=(x,z,r)=>{const b0=Math.floor((x-r+240)/PITCH),b1=Math.floor((x+r+240)/PITCH),c0=Math.floor((z-r+240)/PITCH),c1=Math.floor((z+r+240)/PITCH);for(let a=b0;a<=b1;a++)for(let c=c0;c<=c1;c++){if(a<0||a>5||c<0||c>5)continue;for(const b of BG[a][c])if(P.y<b[4]&&carOverlapsBuilding(x,z,r,r,b))return true}return false};
+function blockPlayerFromTunnels(originX,originZ,x,z,clearance){
+ const entrance=266-clearance,halfWidth=RW/2+clearance;
+ for(let i=0;i<7;i++)for(const edge of[-1,1]){
+  const lane=ZS(i);
+  if(Math.abs(z-lane)<=halfWidth&&edge*x>entrance&&edge*originX<=entrance)x=edge*entrance;
+  const crossLane=XS(i);
+  if(Math.abs(x-crossLane)<=halfWidth&&edge*z>entrance&&edge*originZ<=entrance)z=edge*entrance;
+ }
+ return{x,z}
+}
+function playerInTunnel(x,z,clearance){
+ const entrance=266-clearance,exit=398+clearance,halfWidth=RW/2+clearance;
+ for(let i=0;i<7;i++)for(const edge of[-1,1]){
+  if(edge*x>entrance&&edge*x<exit&&Math.abs(z-ZS(i))<halfWidth)return true;
+  if(edge*z>entrance&&edge*z<exit&&Math.abs(x-XS(i))<halfWidth)return true;
+ }
+ return false
+}
 function resolveCarPosition(car,x,z,others){
  const width=1.15,s=Math.abs(Math.sin(car.psi)),co=Math.abs(Math.cos(car.psi)),ex=co*car.L/2+s*width,ez=s*car.L/2+co*width,originX=car.x,originZ=car.z;
  let hit=false,nx=0,nz=0,hitOther=null;
@@ -736,7 +792,7 @@ function updatePoliceDrive(dt){
  policeCar.g.position.set(policeCar.x,0,policeCar.z);policeCar.g.rotation.y=policeCar.psi;
  P.x=policeCar.x;P.z=policeCar.z;P.y=0;P.vy=0;P.yaw=policeCar.psi+PI+vehicleLook.yaw;P.pitch=vehicleLook.pitch;
 }
-function togglePoliceCar(){if(ROLE!=='police')return;if(inPoliceCar){inPoliceCar=false;policeCar.g.visible=true;P.x=clamp(policeCar.x+Math.cos(policeCar.psi)*2.5,-LIM,LIM);P.z=clamp(policeCar.z-Math.sin(policeCar.psi)*2.5,-LIM,LIM);P.yaw=policeCar.psi+PI;P.vx=0;P.vz=0;vehicleLook.yaw=0;vehicleLook.pitch=0;say('パトカーから降りました。',1400);return}
+function togglePoliceCar(){if(ROLE!=='police')return;if(inPoliceCar){const exitX=clamp(policeCar.x+Math.cos(policeCar.psi)*2.5,-LIM,LIM),exitZ=clamp(policeCar.z-Math.sin(policeCar.psi)*2.5,-LIM,LIM);if(playerInTunnel(exitX,exitZ,.4)){say('トンネル内ではパトカーから降りられません。',1800);return}inPoliceCar=false;policeCar.g.visible=true;P.x=exitX;P.z=exitZ;P.yaw=policeCar.psi+PI;P.vx=0;P.vz=0;vehicleLook.yaw=0;vehicleLook.pitch=0;say('パトカーから降りました。',1400);return}
 if(policeCar&&Math.hypot(P.x-policeCar.x,P.z-policeCar.z)<5){inPoliceCar=true;policeCar.g.visible=!!view;P.x=policeCar.x;P.z=policeCar.z;P.yaw=policeCar.psi+PI;vehicleLook.yaw=0;vehicleLook.pitch=0;say('パトカーに乗りました。WASDで運転、Vで視点切替。',1800)}else say('近くに乗れるパトカーがありません。',1500)}
 function updateCriminalPolice(dt){if(ROLE!=='criminal'||!criminalPolice.length||!culprit||culprit.dead)return;const targetCount=criminalPoliceTarget();if(criminalPolice.length<targetCount)addCriminalPoliceFleet(targetCount);for(let i=0;i<criminalPolice.length;i++){const c=criminalPolice[i];const dx=culprit.x-c.x,dz=culprit.z-c.z,distance=Math.hypot(dx,dz);if(distance<6){end(false,'逮捕された','パトカーに追いつかれた。逃走はここまでだ。');return}
 const tx=culprit.x-Math.sin(culprit.psi)*9+Math.cos(culprit.psi)*(i-1)*5,tz=culprit.z-Math.cos(culprit.psi)*9-Math.sin(culprit.psi)*(i-1)*5,desired=Math.atan2(tx-c.x,tz-c.z),maxTurn=1.8*dt;
@@ -751,7 +807,7 @@ function updPlayer(dt){P.inv=Math.max(0,P.inv-dt);if(ROLE==='criminal')updateCri
 const mv=mx||mz,run=(K.ShiftLeft||K.ShiftRight)&&mv&&P.hp>HP_RUN_THRESHOLD,sp=zoom>.5?2.5:run?9.5:5.2;let vx=0,vz=0;if(mv){const l=Math.hypot(mx,mz);mx/=l;mz/=l;vx=(mx*cos+mz*sin)*sp;vz=(-mx*sin+mz*cos)*sp;P.walk+=dt*(run?12:8)}
 if(P.rag>0){P.rag-=dt;if(immobilized){P.vx=0;P.vz=0;vx=0;vz=0}else{vx=P.vx;vz=P.vz;P.vx*=.985;P.vz*=.985}}
 if(ROLE==='police'&&!inPoliceCar){if(K.Space&&P.ground&&!P.rag&&!immobilized){P.vy=7.5;P.ground=false}P.vy-=20*dt;P.y+=P.vy*dt;if(P.y<=0){P.y=0;P.vy=0;P.ground=true}
-let nx=P.x+vx*dt,nz=P.z+vz*dt;nx=clamp(nx,-LIM,LIM);nz=clamp(nz,-LIM,LIM);if(!bAt(nx,P.z,.4))P.x=nx;if(!bAt(P.x,nz,.4))P.z=nz}
+let nx=P.x+vx*dt,nz=P.z+vz*dt;nx=clamp(nx,-LIM,LIM);nz=clamp(nz,-LIM,LIM);const playerPosition=blockPlayerFromTunnels(P.x,P.z,nx,nz,.4);if(!bAt(playerPosition.x,P.z,.4))P.x=playerPosition.x;if(!bAt(P.x,playerPosition.z,.4))P.z=playerPosition.z}
 // pickups
 for(let i=pick.length-1;i>=0;i--){const p=pick[i];p.m.rotation.y+=dt*2;if(ROLE==='police'&&Math.hypot(p.x-P.x,p.z-P.z)<1.8){if(p.med){if(medkits>=1)continue;medkits=1;say('救急箱を拾いました。Qキーで使用できます。',2000)}else{reserve+=18;say('弾薬を拾った（予備 '+reserve+'）',1500)}tn(900,.1,'sine',.1,1400);S.remove(p.m);pick.splice(i,1)}}
 if(P.hp<=0)end(false,'ゲームオーバー','車に轢かれ続け、街の片隅で意識を失った。……犯人は、まだ走っている。');
