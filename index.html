@@ -146,7 +146,7 @@ body.game-active #menu{display:none!important}
 <script>
 (()=>{
 const $=id=>document.getElementById(id),PI=Math.PI,rnd=Math.random,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const PITCH=80,RW=14,XS=i=>(i-3)*PITCH,ZS=j=>(j-3)*PITCH,LIM=282,WRAP=282;
+const PITCH=80,RW=14,XS=i=>(i-3)*PITCH,ZS=j=>(j-3)*PITCH,LIM=420,WRAP=420;
 let CFG={sens:1,vol:.8,env:1,fov:75,q:1,inv:0,cross:1,csz:6,view:1},MODE='normal',ROLE='police',TIME_ATTACK=false,TIME_OF_DAY='day';
 try{Object.assign(CFG,JSON.parse(localStorage.getItem('cc_cfg')||'{}'));MODE=localStorage.getItem('cc_mode')||'normal';ROLE=localStorage.getItem('cc_role')||'police';TIME_ATTACK=localStorage.getItem('cc_time_attack')==='1';TIME_OF_DAY=localStorage.getItem('cc_time_of_day')||'day'}catch(e){}
 if(TIME_OF_DAY!=='day'&&TIME_OF_DAY!=='night')TIME_OF_DAY='day';
@@ -172,7 +172,7 @@ function imesh(geo,mat,items){const im=new THREE.InstancedMesh(geo,mat,items.len
 const grass=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),new THREE.MeshLambertMaterial({color:0x5f7d4f}));grass.rotation.x=-PI/2;grass.position.y=-.05;S.add(grass);
 const roadT=ctex(256,64,(q,w,h)=>{q.fillStyle='#2c2f34';q.fillRect(0,0,w,h);for(let i=0;i<900;i++){q.fillStyle='rgba('+(rnd()<.5?'0,0,0':'255,255,255')+','+rnd()*.06+')';q.fillRect(rnd()*w,rnd()*h,2,2)}q.fillStyle='#e8c038';for(let k=0;k<4;k++){q.fillRect(k*64+8,h/2-1.5,34,3)}q.fillStyle='rgba(255,255,255,.7)';q.fillRect(0,3,w,2);q.fillRect(0,h-5,w,2)},700/16,1);
 const roadM=new THREE.MeshLambertMaterial({map:roadT}),plainM=new THREE.MeshLambertMaterial({color:0x2c2f34}),whiteM=new THREE.MeshBasicMaterial({color:0xe6e6e6});
-for(let k=0;k<7;k++){const rx=new THREE.Mesh(new THREE.PlaneGeometry(700,RW),roadM);rx.rotation.x=-PI/2;rx.position.set(0,.02,ZS(k));S.add(rx);const rz=new THREE.Mesh(new THREE.PlaneGeometry(700,RW),roadM);rz.rotation.x=-PI/2;rz.rotation.z=PI/2;rz.position.set(XS(k),.02,0);S.add(rz)}
+for(let k=0;k<7;k++){const rx=new THREE.Mesh(new THREE.PlaneGeometry(900,RW),roadM);rx.rotation.x=-PI/2;rx.position.set(0,.02,ZS(k));S.add(rx);const rz=new THREE.Mesh(new THREE.PlaneGeometry(900,RW),roadM);rz.rotation.x=-PI/2;rz.rotation.z=PI/2;rz.position.set(XS(k),.02,0);S.add(rz)}
 {const xs=[],st=[],cw=[];for(let i=0;i<7;i++)for(let j=0;j<7;j++){xs.push([XS(i),.03,ZS(j),-PI/2,0,0,RW,RW,1]);
 for(let s=0;s<8;s++){const o=-RW/2+1+s*1.75;cw.push([XS(i)+o,.04,ZS(j)-RW/2-2.4,-PI/2,0,0]);cw.push([XS(i)+o,.04,ZS(j)+RW/2+2.4,-PI/2,0,0]);cw.push([XS(i)-RW/2-2.4,.04,ZS(j)+o,-PI/2,0,PI/2]);cw.push([XS(i)+RW/2+2.4,.04,ZS(j)+o,-PI/2,0,PI/2])}
 st.push([XS(i)-8.5,.04,ZS(j)-3.5,-PI/2,0,0]);st.push([XS(i)+8.5,.04,ZS(j)+3.5,-PI/2,0,0]);st.push([XS(i)+3.5,.04,ZS(j)-8.5,-PI/2,0,PI/2]);st.push([XS(i)-3.5,.04,ZS(j)+8.5,-PI/2,0,PI/2])}
@@ -234,7 +234,7 @@ function building(x,z,w,d,h,b,bi,bj){
  capFan(roofBuf,topR,x,z,h);
  const bw=w-7,bd=d-7;if(bw>4&&bd>4){const n=1+((rnd()*3)|0);for(let k=0;k<n;k++){const aw=2+rnd()*3,ad=2+rnd()*3,ah=1+rnd()*1.6;addBox(roofBuf,x+(rnd()-.5)*(bw-aw),h,z+(rnd()-.5)*(bd-ad),aw,ah,ad)}}
  if(h>25&&rnd()<.6)addBox(roofBuf,x,h,z,.3,7,.3);
- const bb=[x-w/2,x+w/2,z-d/2,z+d/2,h];BL.push(bb);BG[bi][bj].push(bb)}
+ const bb=[x-w/2,x+w/2,z-d/2,z+d/2,h,r];BL.push(bb);BG[bi][bj].push(bb)}
 function bufMesh(g,mat){if(!g.p.length)return;const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(g.p,3));geo.setAttribute('normal',new THREE.Float32BufferAttribute(g.n,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(g.u,2));geo.setIndex(g.i);S.add(new THREE.Mesh(geo,mat))}
 function finishBuildings(){facBuf.forEach((g,k)=>bufMesh(g,facMat[k]));bufMesh(podBuf,podMat);bufMesh(roofBuf,roofMat)}
 const blockItems=[];
@@ -249,7 +249,30 @@ else for(let a=0;a<2;a++)for(let c=0;c<2;c++){if(rnd()<.15)continue;building(cx+
 for(let t=0;t<3;t++)TREES.push([cx+(rnd()<.5?-30.5:30.5),cz+(rnd()-.5)*50])}
 imesh(bxg(1,1,1),lm(0x8c8c88),blockItems);finishBuildings();
 imesh(new THREE.CylinderGeometry(.22,.38,3.2,10),lm(0x5a3a22),TREES.map(t=>[t[0],1.6,t[1]]));{const crown=new THREE.IcosahedronGeometry(2.1,1);imesh(crown,lm(0x2f6a30),TREES.map(t=>[t[0],4.5,t[1],0,rnd()*6,0,1,1.1,1]));imesh(crown,lm(0x3d7c39),TREES.map(t=>[t[0]+.8,5.5,t[1]-.5,0,rnd()*6,0,.7,.8,.7]))}
-function buildMountainRing(){const geo=new THREE.ConeGeometry(1,1,14,1),groups=[[],[],[]],mats=[lm(0x4b633e),lm(0x596b43),lm(0x6d674c)];const addBand=(edge,span,axis)=>{for(let i=-12;i<=12;i++){const along=i*31+(rnd()-.5)*13,h=58+rnd()*82,r=34+rnd()*20,x=axis==='x'?edge:along,z=axis==='z'?edge:along;groups[(i+12)%3].push([x,h/2,z,0,(rnd()-.5)*.25,0,r,h,r])}};addBand(-332,0,'x');addBand(332,0,'x');addBand(-332,0,'z');addBand(332,0,'z');groups.forEach((items,i)=>{if(items.length){const im=new THREE.InstancedMesh(geo,mats[i],items.length);items.forEach((it,k)=>{dummy.position.set(it[0],it[1],it[2]);dummy.rotation.set(it[3],it[4],it[5]);dummy.scale.set(it[6],it[7],it[8]);dummy.updateMatrix();im.setMatrixAt(k,dummy.matrix)});im.instanceMatrix.needsUpdate=true;S.add(im)}})}
+function buildMountainRing(){
+ const geo=new THREE.ConeGeometry(1,1,14,1),groups=[[],[],[]],mats=[lm(0x4b633e),lm(0x596b43),lm(0x6d674c)];
+ const roads=Array.from({length:7},(_,i)=>ZS(i));
+ const addBand=(edge,axis)=>{for(let i=-12;i<=12;i++){
+  const along=i*31+(rnd()-.5)*13,h=58+rnd()*82,r=34+rnd()*20,x=axis==='x'?edge:along,z=axis==='z'?edge:along;
+  if(roads.some(road=>Math.abs(along-road)<r+RW/2+3))continue;
+  groups[(i+12)%3].push([x,h/2,z,0,(rnd()-.5)*.25,0,r,h,r])
+ }};
+ addBand(-332,'x');addBand(332,'x');addBand(-332,'z');addBand(332,'z');
+ groups.forEach((items,i)=>{if(items.length){const im=new THREE.InstancedMesh(geo,mats[i],items.length);items.forEach((it,k)=>{dummy.position.set(it[0],it[1],it[2]);dummy.rotation.set(it[3],it[4],it[5]);dummy.scale.set(it[6],it[7],it[8]);dummy.updateMatrix();im.setMatrixAt(k,dummy.matrix)});im.instanceMatrix.needsUpdate=true;S.add(im)}});
+ const tunnelMat=new THREE.MeshLambertMaterial({color:0x343a40,side:THREE.DoubleSide}),portalMat=lm(0x77766f),side=RW/2+1,length=132;
+ function addTunnel(axis,edge,lane){
+  const center=edge*332,start=center-length/2,end=center+length/2,segments=24,arcSteps=16,positions=[],indices=[];
+  for(let i=0;i<=segments;i++){const along=start+(end-start)*i/segments;for(let j=0;j<=arcSteps;j++){
+   const angle=PI*j/arcSteps,lat=side*Math.cos(angle),y=side*Math.sin(angle);
+   positions.push(axis==='x'?along:lane+lat,y,axis==='x'?lane+lat:along);
+  }}
+  for(let i=0;i<segments;i++)for(let j=0;j<arcSteps;j++){const a=i*(arcSteps+1)+j,b=a+arcSteps+1;indices.push(a,b,a+1,b,b+1,a+1)}
+  const roof=new THREE.BufferGeometry();roof.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));roof.setIndex(indices);roof.computeVertexNormals();S.add(new THREE.Mesh(roof,tunnelMat));
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(side,.8,8,24,PI),portalMat);
+  for(const along of[start,end]){const portal=ring.clone();portal.position.set(axis==='x'?along:lane,0,axis==='x'?lane:along);if(axis==='x')portal.rotation.y=PI/2;S.add(portal)}
+ }
+ for(let i=0;i<7;i++)for(const edge of[-1,1]){addTunnel('x',edge,roads[i]);addTunnel('z',edge,XS(i))}
+}
 buildMountainRing();
 // ---------- traffic signals ----------
 const SIG=[];for(let i=0;i<7;i++){SIG[i]=[];for(let j=0;j<7;j++)SIG[i][j]=rnd()*22}
@@ -587,15 +610,23 @@ c.g.position.set(c.x,0,c.z);c.g.rotation.y=c.psi;c.g.rotation.z=c.dead?c.g.rotat
 if(ROLE==='police'&&!inPoliceCar&&!P.rag&&P.inv<=0&&P.y<1.3&&c.v>1.5){const dx=P.x-c.x,dz=P.z-c.z,f=dx*s+dz*co,l=dx*co-dz*s;if(Math.abs(f)<c.L/2+.25&&Math.abs(l)<1.15){const dmg=Math.min(70,(8+c.v*3.2)*DF.hp),previousHp=P.hp;P.hp-=dmg;P.inv=1.8;P.rag=.9;P.vy=6;P.vx=Math.sin(c.psi)*c.v*.9;P.vz=Math.cos(c.psi)*c.v*.9;P.ground=false;nz(.3,200,'lowpass',.9);tn(90,.3,'sawtooth',.3,40);horn(1);$('flash').style.opacity=.55;setTimeout(()=>$('flash').style.opacity=0,300);say(mobilityDamageMessage(previousHp),1500);fx(P.x,1,P.z,0xffffff,10,6,.5,.1)}}
 else if(!inPoliceCar&&c.v<=1.5&&Math.abs((P.x-c.x)*co-(P.z-c.z)*s)<1.3&&Math.abs((P.x-c.x)*s+(P.z-c.z)*co)<c.L/2+.4&&P.y<1.3){const dx=P.x-c.x,dz=P.z-c.z,l=dx*co-dz*s,sg=l>=0?1:-1;P.x+=co*sg*.12;P.z-=s*sg*.12}})}
 // ---------- player update ----------
-const bAt=(x,z,r)=>{const b0=Math.floor((x-r+240)/PITCH),b1=Math.floor((x+r+240)/PITCH),c0=Math.floor((z-r+240)/PITCH),c1=Math.floor((z+r+240)/PITCH);for(let a=b0;a<=b1;a++)for(let c=c0;c<=c1;c++){if(a<0||a>5||c<0||c>5)continue;for(const b of BG[a][c])if(P.y<b[4]&&x+r>b[0]&&x-r<b[1]&&z+r>b[2]&&z-r<b[3])return true}return false};
+function carOverlapsBuilding(x,z,ex,ez,b){
+ if(x+ex<=b[0]||x-ex>=b[1]||z+ez<=b[2]||z-ez>=b[3])return false;
+ const radius=b[5]||0;if(!radius)return true;
+ const cx=clamp(x,b[0]+radius-ex,b[1]-radius+ex),cz=clamp(z,b[2]+radius-ez,b[3]-radius+ez),dx=x-cx,dz=z-cz;
+ return dx*dx+dz*dz<radius*radius
+}
+const bAt=(x,z,r)=>{const b0=Math.floor((x-r+240)/PITCH),b1=Math.floor((x+r+240)/PITCH),c0=Math.floor((z-r+240)/PITCH),c1=Math.floor((z+r+240)/PITCH);for(let a=b0;a<=b1;a++)for(let c=c0;c<=c1;c++){if(a<0||a>5||c<0||c>5)continue;for(const b of BG[a][c])if(P.y<b[4]&&carOverlapsBuilding(x,z,r,r,b))return true}return false};
 function resolveCarPosition(car,x,z,others){
  const width=1.15,s=Math.abs(Math.sin(car.psi)),co=Math.abs(Math.cos(car.psi)),ex=co*car.L/2+s*width,ez=s*car.L/2+co*width,originX=car.x,originZ=car.z;
  let hit=false,nx=0,nz=0,hitOther=null;
  for(let pass=0;pass<8;pass++){
   let resolved=false;
   const bi0=clamp(Math.floor((x-ex+240)/PITCH),0,5),bi1=clamp(Math.floor((x+ex+240)/PITCH),0,5),bj0=clamp(Math.floor((z-ez+240)/PITCH),0,5),bj1=clamp(Math.floor((z+ez+240)/PITCH),0,5);
-  for(let bi=bi0;bi<=bi1;bi++)for(let bj=bj0;bj<=bj1;bj++)for(const b of BG[bi][bj]){if(b[4]<.5)continue;const ox=Math.min(x+ex-b[0],b[1]-(x-ex)),oz=Math.min(z+ez-b[2],b[3]-(z-ez));if(ox<=0||oz<=0)continue;hit=true;resolved=true;
-   if(ox<oz){const center=(b[0]+b[1])/2,dir=x===center?(originX===center?(x>=originX?-1:1):Math.sign(originX-center)):x<center?-1:1;const push=dir*(ox+.08);x+=push;nx+=dir}
+  for(let bi=bi0;bi<=bi1;bi++)for(let bj=bj0;bj<=bj1;bj++)for(const b of BG[bi][bj]){if(b[4]<.5)continue;const ox=Math.min(x+ex-b[0],b[1]-(x-ex)),oz=Math.min(z+ez-b[2],b[3]-(z-ez));if(ox<=0||oz<=0||!carOverlapsBuilding(x,z,ex,ez,b))continue;hit=true;resolved=true;
+   const radius=b[5]||0,cx=clamp(x,b[0]+radius-ex,b[1]-radius+ex),cz=clamp(z,b[2]+radius-ez,b[3]-radius+ez),dx=x-cx,dz=z-cz,distance=Math.hypot(dx,dz);
+   if(radius&&distance>0&&distance<radius){const push=radius-distance+.08;x+=dx/distance*push;z+=dz/distance*push;nx+=dx/distance;nz+=dz/distance}
+   else if(ox<oz){const center=(b[0]+b[1])/2,dir=x===center?(originX===center?(x>=originX?-1:1):Math.sign(originX-center)):x<center?-1:1;const push=dir*(ox+.08);x+=push;nx+=dir}
    else{const center=(b[2]+b[3])/2,dir=z===center?(originZ===center?(z>=originZ?-1:1):Math.sign(originZ-center)):z<center?-1:1;const push=dir*(oz+.08);z+=push;nz+=dir}
    break}
   if(resolved)continue;
@@ -612,7 +643,7 @@ function resolveCarPosition(car,x,z,others){
   nx/=length;nz/=length;
   const bounceLength=Math.max(4.4,car.L),steps=Math.ceil(bounceLength/.4),bounceS=Math.abs(nx),bounceC=Math.abs(nz),bounceEx=bounceC*car.L/2+bounceS*width,bounceEz=bounceS*car.L/2+bounceC*width;let clearX=x,clearZ=z,foundClear=false;
   for(let step=1;step<=steps*2;step++){const distance=bounceLength*step/steps,testX=x+nx*distance,testZ=z+nz*distance,ci0=clamp(Math.floor((testX-bounceEx+240)/PITCH),0,5),ci1=clamp(Math.floor((testX+bounceEx+240)/PITCH),0,5),cj0=clamp(Math.floor((testZ-bounceEz+240)/PITCH),0,5),cj1=clamp(Math.floor((testZ+bounceEz+240)/PITCH),0,5);let blocked=false;
-   for(let bi=ci0;bi<=ci1&&!blocked;bi++)for(let bj=cj0;bj<=cj1&&!blocked;bj++)for(const b of BG[bi][bj])if(b[4]>=.5&&testX+bounceEx>b[0]&&testX-bounceEx<b[1]&&testZ+bounceEz>b[2]&&testZ-bounceEz<b[3]){blocked=true;break}
+  for(let bi=ci0;bi<=ci1&&!blocked;bi++)for(let bj=cj0;bj<=cj1&&!blocked;bj++)for(const b of BG[bi][bj])if(b[4]>=.5&&carOverlapsBuilding(testX,testZ,bounceEx,bounceEz,b)){blocked=true;break}
    for(const other of others){if(blocked||other===car||other.dead)continue;const os=Math.abs(Math.sin(other.psi)),oc=Math.abs(Math.cos(other.psi)),oex=oc*other.L/2+os*width,oez=os*other.L/2+oc*width;if(testX+bounceEx>other.x-oex&&testX-bounceEx<other.x+oex&&testZ+bounceEz>other.z-oez&&testZ-bounceEz<other.z+oez)blocked=true}
    if(blocked){if(foundClear)break;continue}clearX=testX;clearZ=testZ;foundClear=true;if(distance>=bounceLength)break
   }
@@ -679,7 +710,7 @@ function updatePoliceDrive(dt){
  
  if(!policeDisabled&&repairT<=0){
    const throttle=K.KeyW?1:K.KeyS?-1:0;
-   policeCar.v=accelCar(policeCar.v,throttle,17,6,9,dt);
+   policeCar.v=accelCar(policeCar.v,throttle,22.5,6,9,dt);
    if(!throttle)policeCar.v*=Math.exp(-1.8*dt);
    const steerTarget=(K.KeyA?1:0)-(K.KeyD?1:0);
    driveSteer+=(steerTarget-driveSteer)*(1-Math.exp(-8*dt));
