@@ -3,7 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="google-site-verification" content="vNgRrpb3UvoY39B0QklxDmnc73egTqjaeguz7IusimM" />
 <link rel="icon" type="image/png" href="City,Cheis.png">
 <title>犯人を追え！ 〜シティ・チェイス〜</title>
 <style>
@@ -840,21 +839,21 @@ function setupSniperPosition(){
  P.x=(sniperRoof[0]+sniperRoof[1])/2;P.z=(sniperRoof[2]+sniperRoof[3])/2;P.y=sniperRoof[4]+.15;P.vx=0;P.vz=0;P.vy=0;P.ground=true;P.yaw=Math.atan2(P.x,P.z);P.pitch=-.16;P.rag=0;view=0;inPoliceCar=false;policeCar.g.visible=true;
  // Build a visible safety railing around the walkable rooftop.
  if(sniperFence)S.remove(sniperFence);sniperFence=new THREE.Group();
- const railMat=new THREE.MeshLambertMaterial({color:0x737b82,emissive:0x111820});
- const minX=sniperRoof[0]+1.7,maxX=sniperRoof[1]-1.7,minZ=sniperRoof[2]+1.7,maxZ=sniperRoof[3]-1.7,y=sniperRoof[4]+.15;
- const railY=y+.72,railH=1.44,th=.16;
+ const railMat=new THREE.MeshLambertMaterial({color:0x59656d,emissive:0x080e12});
+ const minX=sniperRoof[0]+.25,maxX=sniperRoof[1]-.25,minZ=sniperRoof[2]+.25,maxZ=sniperRoof[3]-.25,y=sniperRoof[4]+.15;
+ const railH=1.18,th=.10,lowY=y+.12,topY=y+railH;
  function rail(x,z,w,d,h,cy){const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),railMat);m.position.set(x,cy,z);sniperFence.add(m)}
- // Leave a wide opening in one side of the railing.
- const gapW=Math.min(6,(maxX-minX)*.28),gapL=(minX+maxX-gapW)/2,gapR=(minX+maxX+gapW)/2;
- rail((minX+gapL)/2,minZ,gapL-minX,th,railH,railY);
- rail((gapR+maxX)/2,minZ,maxX-gapR,th,railH,railY);
- rail((minX+maxX)/2,maxZ,maxX-minX,th,railH,railY);
- rail(minX,(minZ+maxZ)/2,th,maxZ-minZ,railH,railY);
- rail(maxX,(minZ+maxZ)/2,th,maxZ-minZ,railH,railY);
- const postGap=4;
- for(let x=minX;x<=maxX+.01;x+=postGap){if(x<gapL-.25||x>gapR+.25)rail(x,minZ,.22,.22,railH,railY);rail(x,maxZ,.22,.22,railH,railY)}
- for(let z=minZ;z<=maxZ+.01;z+=postGap){rail(minX,z,.22,.22,railH,railY);rail(maxX,z,.22,.22,railH,railY)}
- S.add(sniperFence);sniperRoof.walkBounds={minX:minX+1.0,maxX:maxX-1.0,minZ:minZ+1.0,maxZ:maxZ-1.0};
+ // Iron-grid fence: thin bars let the player see the city and aim through them.
+ const gapW=Math.min(5,(maxX-minX)*.24),gapL=(minX+maxX-gapW)/2,gapR=(minX+maxX+gapW)/2;
+ function frontFence(a,b,z,skipGap){
+   rail((a+b)/2,z,b-a,.10,.10,lowY);
+   rail((a+b)/2,z,b-a,.10,.10,topY);
+   for(let x=a;x<=b+.01;x+=1.15){if(!skipGap||x<gapL-.2||x>gapR+.2)rail(x,z,.07,.07,railH,y+railH/2)}
+ }
+ function sideFence(x,a,b){rail(x,(a+b)/2,.10,b-a,.10,lowY);rail(x,(a+b)/2,.10,b-a,.10,topY);for(let z=a;z<=b+.01;z+=1.15)rail(x,z,.07,.07,railH,y+railH/2)}
+ frontFence(minX,gapL,minZ,true);frontFence(gapR,maxX,minZ,true);frontFence(minX,maxX,maxZ,false);
+ sideFence(minX,minZ,maxZ);sideFence(maxX,minZ,maxZ);
+ S.add(sniperFence);sniperRoof.walkBounds={minX:sniperRoof[0]+.1,maxX:sniperRoof[1]-.1,minZ:sniperRoof[2]+.1,maxZ:sniperRoof[3]-.1};
 }
 function updateMission(dt){
  if(GAME_MODE==='race'){
@@ -1227,7 +1226,7 @@ function updateHelicopter(dt){if(!Number.isFinite(heli.vx))heli.vx=Math.sin(heli
 function updPlayer(dt){P.inv=Math.max(0,P.inv-dt);nitroT=Math.max(0,nitroT-dt);nitroCooldown=Math.max(0,nitroCooldown-dt);if(ROLE==='criminal'||ROLE==='racer')updateCriminalDrive(dt);else if(ROLE==='helicopter'||ROLE==='freeroam'&&inFreeHelicopter)updateHelicopter(dt);else if(inPoliceCar)updatePoliceDrive(dt);const sin=Math.sin(P.yaw),cos=Math.cos(P.yaw),immobilized=isPoliceRole()&&!inPoliceCar&&P.hp<=HP_MOVE_THRESHOLD;let mx=0,mz=0;if((isPoliceRole()||ROLE==='freeroam')&&!P.rag&&!inPoliceCar&&!inFreeHelicopter&&!immobilized){if(K.KeyW)mz-=1;if(K.KeyS)mz+=1;if(K.KeyA)mx-=1;if(K.KeyD)mx+=1}
 const mv=mx||mz,run=(K.ShiftLeft||K.ShiftRight)&&mv&&P.hp>HP_RUN_THRESHOLD,sp=zoom>.5?2.5:run?9.5:5.2;let vx=0,vz=0;if(mv){const l=Math.hypot(mx,mz);mx/=l;mz/=l;vx=(mx*cos+mz*sin)*sp;vz=(-mx*sin+mz*cos)*sp;P.walk+=dt*(run?12:8)}
 if(P.rag>0){P.rag-=dt;if(immobilized){P.vx=0;P.vz=0;vx=0;vz=0}else{vx=P.vx;vz=P.vz;P.vx*=.985;P.vz*=.985}}
-if(ROLE==='sniper'&&sniperRoof&&!P.rag&&!immobilized){const bounds=sniperRoof.walkBounds;P.y=sniperRoof[4]+.15;P.vy=0;P.ground=true;let nx=clamp(P.x+vx*dt,bounds.minX,bounds.maxX),nz=clamp(P.z+vz*dt,bounds.minZ,bounds.maxZ);P.x=nx;P.z=nz}
+if(ROLE==='sniper'&&sniperRoof&&!P.rag&&!immobilized){const bounds=sniperRoof.walkBounds;if(K.Space&&P.ground){P.vy=7.5;P.ground=false}P.vy-=20*dt;P.y+=P.vy*dt;let nx=P.x+vx*dt,nz=P.z+vz*dt;P.x=nx;P.z=nz;if(P.y<=sniperRoof[4]+.15&&P.vy<=0){P.y=sniperRoof[4]+.15;P.vy=0;P.ground=true}if(P.x<bounds.minX||P.x>bounds.maxX||P.z<bounds.minZ||P.z>bounds.maxZ||P.y<sniperRoof[4]-3){end(false,'屋上から転落','足を踏み外して屋上から落ちてしまった。任務失敗！');return}}
 else if((ROLE==='police'||ROLE==='freeroam')&&!inPoliceCar&&!inFreeHelicopter){if(ROLE==='police'&&K.Space&&P.ground&&!P.rag&&!immobilized){P.vy=7.5;P.ground=false}P.vy-=20*dt;P.y+=P.vy*dt;if(P.y<=0){P.y=0;P.vy=0;P.ground=true}
 let nx=P.x+vx*dt,nz=P.z+vz*dt;nx=clamp(nx,-LIM,LIM);nz=clamp(nz,-LIM,LIM);const playerPosition=blockPlayerFromTunnels(P.x,P.z,nx,nz,.4);if(!bAt(playerPosition.x,P.z,.4))P.x=playerPosition.x;if(!bAt(P.x,playerPosition.z,.4))P.z=playerPosition.z}
 // pickups
@@ -1275,7 +1274,7 @@ if(A&&eng.length){const near=cars.filter(c=>!c.dead&&!c.isPolice).map(c=>[c,Math
 // hud
 sigT-=dt;if(sigT<=0){sigT=.1;$('time').textContent=ROLE==='freeroam'?'フリーローム':TIME_ATTACK?'TA '+fmtT(gt)+' / '+fmtT(DF.time):fmtT(DF.time-gt);$('time').style.color=ROLE==='freeroam'?'#4fc3f7':TIME_ATTACK?'#f2c14e':DF.time-gt<60?'#ff6a5a':'#eef3f8';const healthValue=ROLE==='criminal'?criminalHealth:P.hp;$('healthLabel').textContent=ROLE==='criminal'?'車体耐久':'HP';$('hpfill').style.width=Math.max(0,healthValue)+'%';$('medkits').textContent=ROLE==='police'?'救急箱 '+medkits+' / 1 (Q)':'';$('ammo').innerHTML=ROLE==='helicopter'?'∞ <small>/ ∞</small>':(reloadT>0?'RELOAD':ammo)+' <small>/ '+reserve+'</small>';$('specialEquipment').innerHTML=(isPoliceRole()||ROLE==='helicopter'?'EMP [X]：'+empCharges+' 発':'')+(ROLE==='criminal'?'煙幕 [G]：'+smokeCharges+' 個':'');$('stat').innerHTML=ROLES[ROLE].n+'　'+DF.n+'　'+(TIME_OF_DAY==='night'?'夜間':'昼間')+(TIME_ATTACK?'　タイムアタック':'')+(ROLE==='police'?'　誤射 '+mist+' / '+DF.mist:ROLE==='criminal'?'　車体 '+criminalHealth+'%':ROLE==='freeroam'?'　自由走行':'　高度 '+Math.round(heli.y)+'m')+(ROLE==='police'||ROLE==='freeroam'?'<br>視点 '+(view?'三人称':'一人称')+' (V)':'');const objective=ROLE==='police'?'逃走中の犯人の車を見つけて撃て':ROLE==='criminal'?'高速パトカーとヘリ・警察官の銃撃から逃げ切れ':ROLE==='freeroam'?'ミッションなし。街を自由に走ろう':'上空から犯人車を捜索';$('obj').textContent=ROLE==='freeroam'?objective:TIME_ATTACK?objective+'　残り '+fmtT(DF.time-gt):objective;$('suspectInfo').style.display=ROLE==='helicopter'?'block':'none';if(ROLE==='helicopter')$('suspectDescription').textContent=culprit.colName+'色の'+CTYPE[culprit.type];updateSpeedometer();if(DF.radar!==false){radarPulse+=.1;drawRadar()}
 const r=camRay();let bt=1e9,bc=null;cars.forEach(c=>{if(c.dead||c.isPolice||(ROLE==='helicopter'&&!c.culprit))return;const h=rayCar(c,r);if(h&&h.t<bt){bt=h.t;bc=c}});$('target').textContent=bc&&bt<(zoom>.5?120:45)?(ROLE==='helicopter'?bc.colName+'色の'+CTYPE[bc.type]:bc.colName+'の'+CTYPE[bc.type]+'　ナンバー '+bc.plate):'';$('cross').classList.toggle('hit',hitFlash>0);$('scope').style.opacity=zoom>.5?1:0;crossShow()}
-const near2=pick.find(p=>Math.hypot(p.x-P.x,p.z-P.z)<4);$('hint').textContent=ROLE==='freeroam'?inFreeHelicopter?'E：ヘリから降りる　W/S：前進・後退　A/D：旋回　Space/Shift：高度　V：視点':'E：近くのパトカー／ヘリに乗る・降りる　WASD：移動　N：ニトロ　H：サイレン切替　パトカー '+(Math.hypot(P.x-policeCar.x,P.z-policeCar.z)<5?'に乗車可能':'')+'　ヘリ '+(Math.hypot(P.x-heli.x,P.z-heli.z)<10?'に乗車可能':''):ROLE==='criminal'?'W/S：アクセル・ブレーキ　A/D：ハンドル　Space：サイドブレーキ・ドリフト　マウス：視点移動　N：ニトロ　高速パトカー '+criminalPolice.length+' / '+DF.policeMax+'台・ヘリ・警察官の銃撃から逃げろ':ROLE==='helicopter'?'W/S：前進・後退　A/D：旋回　マウス：照準　左クリック：射撃　R：リロード　Space：上昇　Shift：下降　高度 '+Math.round(heli.y)+'m':ROLE==='sniper'?'WASD：柵の内側を移動　マウス：照準　右クリック：スコープ　左クリック：射撃　R：リロード':inPoliceCar?('E：降りる　WASD：運転　Space：サイドブレーキ・ドリフト　N：ニトロ　H：サイレン切替'+(sirenOn?'（ON）':'（OFF）')+'　V：視点切替（現在 '+(view?'三人称':'一人称')+'）　マウス：視点移動　B：通行止め　損傷 '+policeDamage+'/2'+(policeDisabled?(repairT>0?'　修理中 '+Math.ceil(repairT)+'秒':'　F：修理（15秒）'):(repairT>0?'　修理中 '+Math.ceil(repairT)+'秒':''))+(MODE==='easy'?'　速度6以上で犯人車に体当たり':'')):policeCar&&Math.hypot(policeCar.x-P.x,policeCar.z-P.z)<5?'E：パトカーに乗る':near2?(near2.med?(medkits?'救急箱は所持上限です':'救急箱を拾う'):'弾薬を拾う'):''}}
+const near2=pick.find(p=>Math.hypot(p.x-P.x,p.z-P.z)<4);$('hint').textContent=ROLE==='freeroam'?inFreeHelicopter?'E：ヘリから降りる　W/S：前進・後退　A/D：旋回　Space/Shift：高度　V：視点':'E：近くのパトカー／ヘリに乗る・降りる　WASD：移動　N：ニトロ　H：サイレン切替　パトカー '+(Math.hypot(P.x-policeCar.x,P.z-policeCar.z)<5?'に乗車可能':'')+'　ヘリ '+(Math.hypot(P.x-heli.x,P.z-heli.z)<10?'に乗車可能':''):ROLE==='criminal'?'W/S：アクセル・ブレーキ　A/D：ハンドル　Space：サイドブレーキ・ドリフト　マウス：視点移動　N：ニトロ　高速パトカー '+criminalPolice.length+' / '+DF.policeMax+'台・ヘリ・警察官の銃撃から逃げろ':ROLE==='helicopter'?'W/S：前進・後退　A/D：旋回　マウス：照準　左クリック：射撃　R：リロード　Space：上昇　Shift：下降　高度 '+Math.round(heli.y)+'m':ROLE==='sniper'?'WASD：屋上を移動　Space：ジャンプ　柵の隙間から狙撃　マウス：照準　右クリック：スコープ　左クリック：射撃　R：リロード':inPoliceCar?('E：降りる　WASD：運転　Space：サイドブレーキ・ドリフト　N：ニトロ　H：サイレン切替'+(sirenOn?'（ON）':'（OFF）')+'　V：視点切替（現在 '+(view?'三人称':'一人称')+'）　マウス：視点移動　B：通行止め　損傷 '+policeDamage+'/2'+(policeDisabled?(repairT>0?'　修理中 '+Math.ceil(repairT)+'秒':'　F：修理（15秒）'):(repairT>0?'　修理中 '+Math.ceil(repairT)+'秒':''))+(MODE==='easy'?'　速度6以上で犯人車に体当たり':'')):policeCar&&Math.hypot(policeCar.x-P.x,policeCar.z-P.z)<5?'E：パトカーに乗る':near2?(near2.med?(medkits?'救急箱は所持上限です':'救急箱を拾う'):'弾薬を拾う'):''}}
 updateMissionHud();R.render(S,cam)}
 applyCfg();requestAnimationFrame(loop);
 })();
